@@ -11,5 +11,7 @@ The goal of this project is to generate Java code in the architecture used by Sp
 ## Configurations
 
 Open the class diagram in Astah.
+
 Select the template path, and then the path where the generated code will be stored.
+
 Click on 'Generate' and run for the hug! xD
