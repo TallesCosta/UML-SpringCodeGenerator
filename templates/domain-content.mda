@@ -1,0 +1,9 @@
+<%  if(!c.hasStereotype("interface")) { %>
+package ${c.owner.getFullyQualifiedName(".")};
+<% domain.setup(c) %>${domain.imports()}
+${domain.qualifier()} class ${c.name}${domain.inheritages()} {
+
+${domain.attributes()}${domain.constructors()}${domain.gets()}${domain.sets()}${domain.methods()}
+
+}
+<% } %>

@@ -1,0 +1,66 @@
+import java.util.*
+import in.labulle.anycode.uml.*
+import in.labulle.anycode.engine.groovy.directive.*
+
+class Interface {
+	JavaDirective java = new JavaDirective()
+	IInterface i
+
+	def setup(IInterface i) {
+		this.i = i
+	}
+
+	def imports(){
+		String result = ""
+
+		// Some code to generate the imports needed
+
+		return result
+	}
+
+	def qualifier() {
+		String result = ""
+
+		result += i.visibility.toString().toLowerCase()
+
+		return result
+	}
+
+	def inheritages() {
+		String result = ""
+
+		if(!i.generalizations.isEmpty()) {
+			result += " extends"
+			i.generalizations.each {
+				result += " " + it.name + ","
+			}
+
+			result = result.substring(0, result.length() - 1)
+		}
+
+		return result
+	}
+
+	def methods() {
+		if(i.operations.isEmpty())
+			return ""
+
+		String result = "\t// Methods Signature\n"
+
+		i.operations.each {
+			result += "\t${it.visibility.toString().toLowerCase()} ${it.returnType.name} ${it.name}("
+
+			it.parameters.each {
+				result += "${it.dataType.name} ${it.name}, "
+			}
+
+			if (!it.parameters.isEmpty())
+				result = result.substring(0, result.length() - 2)
+			
+			result += ");\n\n"
+		}
+
+		return result
+	}
+
+}
