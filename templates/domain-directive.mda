@@ -17,7 +17,8 @@ class Domain {
 
 			// Attribute isn't a relation? OR
 			// Attribute is relation and owning side?
-			if (!it.isRelation() || it.getCardinality() != Cardinality.ZERO_TO_ONE) {
+			if (!it.isRelation() || !it.name.isEmpty()
+				&& it.isOneToOne()) {
 				// Primitive and simple association attributes
 				attributes.push(it)
 			// Attribute is a relation? AND
@@ -142,6 +143,10 @@ class Domain {
 			result += "\tpublic ${it.dataType.name} get${it.name.capitalize()}() {\n\t\treturn ${it.name};\n\t}\n\n"
 		}
 
+		attributesList.each {
+			result += "\tpublic List<${it.dataType.name}> get${it.name.capitalize()}() {\n\t\treturn ${it.name};\n\t}\n\n"
+		}
+
 		return result
 	}
 
@@ -153,6 +158,10 @@ class Domain {
 
 		attributes.each {
 			result += "\tpublic void set${it.name.capitalize()}(${it.dataType.name} ${it.name}) {\n\t\tthis.${it.name} = ${it.name};\n\t}\n\n"
+		}
+
+		attributesList.each {
+			result += "\tpublic void set${it.name.capitalize()}(List<${it.dataType.name}> ${it.name}) {\n\t\tthis.${it.name} = ${it.name};\n\t}\n\n"
 		}
 
 		return result

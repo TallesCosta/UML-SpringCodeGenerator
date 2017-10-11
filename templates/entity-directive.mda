@@ -17,7 +17,8 @@ class Entity {
 
 			// Attribute isn't a relation? OR
 			// Attribute is relation and owning side?
-			if (!it.isRelation() || it.getCardinality() != Cardinality.ZERO_TO_ONE) {
+			if (!it.isRelation() || !it.name.isEmpty()
+				&& it.isOneToOne()) {
 				// Primitive and simple association attributes
 				attributes.push(it)
 			// Attribute is a relation? AND
@@ -61,7 +62,6 @@ class Entity {
 		String result = "\t// Attributes\n"
 
 		attributes.each {
-			result += "${it.getCardinality()}\n"
 			result += "\t${singleAttrAnnotation(it)}\n"
 			result += "\t${it.visibility.toString().toLowerCase()} ${it.dataType.name} ${it.name};\n"
 		}
