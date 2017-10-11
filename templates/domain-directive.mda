@@ -79,7 +79,7 @@ class Domain {
 	}
 
 	def attributes() {
-		if(attributes.isEmpty() || attributesList.isEmpty())
+		if(attributes.isEmpty() && attributesList.isEmpty())
 			return ""
 
 		String result = "\t// Attributes\n"
