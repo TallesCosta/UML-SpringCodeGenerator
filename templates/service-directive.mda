@@ -42,6 +42,8 @@ class Service {
 		result += "\tpublic ${c.name} delete(long id) {\n"
 		result += "\t\treturn ${c.name.toLowerCase()}Repository.delete(id);\n"
 		result += "\t}\n"
+
+		return result
 	}
 
 }
