@@ -32,13 +32,25 @@ class Entity {
 
 	def imports() {
 		String result = "";
+		result += "import javax.persistence.Entity;\n";
+		result += "import javax.persistence.Table;\n";
+
+		attributes.each {
+			if(it.name == "id") {
+				result += "import javax.persistence.Id;\n";
+			}
+		}
+
+		if (!attributesList.isEmpty() || !attributes.isEmpty()) {
+			result += "import javax.persistence.Column;\n";
+		}
 
 		if (!attributesList.isEmpty()) {
 			result += "import java.util.List;\n";
-			result += "import javax.persistence.CascadeType;";
+			result += "import javax.persistence.CascadeType;\n";
 		}
 
-		return result.equals("") ? "" : "\n${result}\n" ;
+		return "\n${result}";
 	}
 
 	def resolveTableAnnotation() {
@@ -59,15 +71,15 @@ class Entity {
 		if(attributes.isEmpty() && attributesList.isEmpty())
 			return ""
 
-		String result = "\t// Attributes\n"
+		String result = "\t// Attributes"
 
 		attributes.each {
-			result += "\t${singleAttrAnnotation(it)}\n"
+			result += "\n\t${singleAttrAnnotation(it)}\n"
 			result += "\t${it.visibility.toString().toLowerCase()} ${it.dataType.name} ${it.name};\n"
 		}
 
 		attributesList.each {
-			result += "\t${multipleAttrAnnotation(it)}\n"
+			result += "\n\t${multipleAttrAnnotation(it)}\n"
 			result += "\t${it.visibility.toString().toLowerCase()} List<${it.dataType.name}> ${it.name};\n"
 		}
 
