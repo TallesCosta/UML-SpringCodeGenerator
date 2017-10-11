@@ -27,7 +27,7 @@ class Service {
 		String result = ""
 
 		result += "\nimport org.springframework.stereotype.Service;\n"
-		result += "\nimport ${c.owner.getFullyQualifiedName(".")}.repository.${c.name};\n"
+		result += "\nimport ${c.owner.getFullyQualifiedName(".")}.repository.${c.name}Repository;\n"
 
 		return result
 	}
