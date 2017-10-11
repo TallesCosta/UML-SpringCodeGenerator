@@ -3,7 +3,6 @@ import in.labulle.anycode.uml.*
 import in.labulle.anycode.engine.groovy.directive.*
 
 class Entity {
-	JavaDirective java = new JavaDirective()
 	IClass c;
 	List<IAttribute> attributes;
 	List<IAttribute> attributesList;

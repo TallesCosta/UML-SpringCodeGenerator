@@ -2,98 +2,15 @@ import java.util.*
 import in.labulle.anycode.uml.*
 import in.labulle.anycode.engine.groovy.directive.*
 
-class Entity {
-	JavaDirective java = new JavaDirective()
+class Repository {
 	IClass c;
-	List<IAttribute> attributes;
-	List<IAttribute> attributesList;
 
 	def setup(IClass c) {
 		this.c = c;
-		this.attributes = new ArrayList<IAttribute>()
-		this.attributesList = new ArrayList<IAttribute>()
-
-		c.attributes.each {
-
-			// Attribute isn't a relation? OR
-			// Attribute is relation and owning side?
-			if (!it.isRelation() || !it.name.isEmpty()
-				&& it.isOneToOne()) {
-				// Primitive and simple association attributes
-				attributes.push(it)
-			// Attribute is a relation? AND
-			// Attribute is relation One-To-Many?
-			} else if (it.isRelation() && it.isOneToMany()) {
-				// multiple association attributes (List)
-				attributesList.push(it)
-			}
-		}
 	}
 
 	def imports() {
-		String result = "";
-		result += "import javax.persistence.Entity;\n";
-		result += "import javax.persistence.Table;\n";
-
-		attributes.each {
-			if(it.name == "id") {
-				result += "import javax.persistence.Id;\n";
-			}
-		}
-
-		if (!attributesList.isEmpty() || !attributes.isEmpty()) {
-			result += "import javax.persistence.Column;\n";
-		}
-
-		if (!attributesList.isEmpty()) {
-			result += "import java.util.List;\n";
-			result += "import javax.persistence.CascadeType;\n";
-		}
-
-		return "\n${result}";
-	}
-
-	def resolveTableAnnotation() {
-		String tableName = ""
-		if(c.name.endsWith("y"))
-			tableName = c.name.toLowerCase().substring(0, c.name.size() - 1) + "ies"
-		else if(c.name.endsWith("m"))
-			tableName = c.name.toLowerCase().substring(0, c.name.size() - 1) + "ns"
-		else if(c.name.endsWith("s"))
-			tableName = c.name.toLowerCase()
-		else
-			tableName = c.name.toLowerCase() + "s"
-
-		return "@Table(name=\"${tableName}\")"
-	}
-
-	def attributes() {
-		if(attributes.isEmpty() && attributesList.isEmpty())
-			return ""
-
-		String result = "\t// Attributes"
-
-		attributes.each {
-			result += "\n\t${singleAttrAnnotation(it)}\n"
-			result += "\t${it.visibility.toString().toLowerCase()} ${it.dataType.name} ${it.name};\n"
-		}
-
-		attributesList.each {
-			result += "\n\t${multipleAttrAnnotation(it)}\n"
-			result += "\t${it.visibility.toString().toLowerCase()} List<${it.dataType.name}> ${it.name};\n"
-		}
-
-		return "${result}\n"
-	}
-
-	def multipleAttrAnnotation(IAttribute attr) {
-		return "@OneToMany(targetEntity = ${attr.dataType.name}.class, cascade = CascadeType.ALL)"
-	}
-
-	def singleAttrAnnotation(IAttribute attr) {
-		if(attr.name == "id")
-			return "@Id"
-		return "@Column"
+		return "\nimport org.springframework.data.jpa.repository.JpaRepository;\n"
 	}
 
 }
