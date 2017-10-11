@@ -1,4 +1,4 @@
-<%  if(!c.hasStereotype("interface")) { %>
+<%  if(!c.hasStereotype("interface") && !c.hasStereotype("entity")) { %>
 package ${c.owner.getFullyQualifiedName(".")};
 <% domain.setup(c) %>${domain.imports()}
 ${domain.qualifier()} class ${c.name}${domain.inheritages()} {
