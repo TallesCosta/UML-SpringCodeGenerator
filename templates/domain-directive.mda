@@ -17,8 +17,7 @@ class Domain {
 
 			// Attribute isn't a relation? OR
 			// Attribute is relation and owning side?
-			if (!it.isRelation() || it.otherSide.name.isEmpty()
-				&& it.isOneToOne()) {
+			if (!it.isRelation() || it.getCardinality() != Cardinality.ZERO_TO_ONE) {
 				// Primitive and simple association attributes
 				attributes.push(it)
 			// Attribute is a relation? AND
@@ -96,7 +95,7 @@ class Domain {
 	}
 
 	def constructors() {
-		if(attributes.isEmpty() || attributesList.isEmpty())
+		if(attributes.isEmpty() && attributesList.isEmpty())
 			return ""
 
 		String result = "\t// Constructors\n"
@@ -134,7 +133,7 @@ class Domain {
 	}
 
 	def gets() {
-		if(attributes.isEmpty() || attributesList.isEmpty())
+		if(attributes.isEmpty() && attributesList.isEmpty())
 			return ""
 
 		String result = "\t// Getters\n"
@@ -147,7 +146,7 @@ class Domain {
 	}
 
 	def sets() {
-		if(attributes.isEmpty() || attributesList.isEmpty())
+		if(attributes.isEmpty() && attributesList.isEmpty())
 			return ""
 
 		String result = "\t// Setters\n"
