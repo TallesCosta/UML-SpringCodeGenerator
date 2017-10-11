@@ -1,1 +1,1 @@
-${targetDir}/${c.getFullyQualifiedName("/")}.java
+${targetDir}/${c.owner.getFullyQualifiedName("/")}/domain/${c.name}.java
