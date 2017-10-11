@@ -34,7 +34,7 @@ class Domain {
 		String result = "";
 
 		if (!attributesList.isEmpty())
-			result += "import java.util.list;";
+			result += "import java.util.List;";
 
 		return result.equals("") ? "" : "\n${result}\n" ;
 	}
