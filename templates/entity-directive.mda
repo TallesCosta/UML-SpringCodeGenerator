@@ -1,0 +1,86 @@
+import java.util.*
+import in.labulle.anycode.uml.*
+import in.labulle.anycode.engine.groovy.directive.*
+
+class Entity {
+	JavaDirective java = new JavaDirective()
+	IClass c;
+	List<IAttribute> attributes;
+	List<IAttribute> attributesList;
+
+	def setup(IClass c) {
+		this.c = c;
+		this.attributes = new ArrayList<IAttribute>()
+		this.attributesList = new ArrayList<IAttribute>()
+
+		c.attributes.each {
+
+			// Attribute isn't a relation? OR
+			// Attribute is relation and owning side?
+			if (!it.isRelation() || it.otherSide.name.isEmpty()
+				&& it.isOneToOne()) {
+				// Primitive and simple association attributes
+				attributes.push(it)
+			// Attribute is a relation? AND
+			// Attribute is relation One-To-Many?
+			} else if (it.isRelation() && it.isOneToMany()) {
+				// multiple association attributes (List)
+				attributesList.push(it)
+			}
+		}
+	}
+
+	def imports() {
+		String result = "";
+
+		if (!attributesList.isEmpty()) {
+			result += "import java.util.List;";
+			result += "import javax.persistence.CascadeType;";
+		}
+
+		return result.equals("") ? "" : "\n${result}\n" ;
+	}
+
+	def resolveTableAnnotation() {
+		String tableName = ""
+		if(!c.name.endsWith("y"))
+			tableName = c.name.toLowerCase() + "s"
+		else
+			tableName = c.name.toLowerCase().substring(0, c.name.size() - 1) + "ies"
+
+		return "@Table(name=\"${tableName}\")"
+	}
+
+	def attributes() {
+		if(attributes.isEmpty() || attributesList.isEmpty())
+			return ""
+
+		String result = "\t// Attributes\n"
+
+		attributes.each {
+			result += "${singleAttrAnnotation(it)}\n"
+			result += "\t${it.visibility.toString().toLowerCase()} ${it.dataType.name} ${it.name};\n"
+		}
+
+		attributesList.each {
+			result += "\t${multipleAttrAnnotation(it)}\n"
+			result += "\t${it.visibility.toString().toLowerCase()} List<${it.dataType.name}> ${it.name};\n"
+		}
+
+		return "${result}\n"
+	}
+
+	def multipleAttrAnnotation(IAttribute attr) {
+		return "\t@OneTOMany("
+			+ "\t\ttargetEntity = ${attr.dataType.name}.class,"
+			+ "\t\tcascade = CascadeType.ALL"
+			+ "\t)"
+	}
+
+	def singleAttrAnnotation(IAttribute attr) {
+		if(attr.name == "id")
+			return "@Id"
+		return "@Column"
+	}
+
+}
