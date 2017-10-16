@@ -11,9 +11,11 @@ The goal of this project is to generate Java code in the architecture used by Sp
 ## Usage
 
 First, install the [Anycode plugin for Astah](http://astah.net/features/anycode-plugin);
+
 Create your class diagram following the desires of your heart (or your project);
 
 Select the template path, and then the path where the generated code will be stored (usually ```./result```).
+
 Click on 'Generate' and it's done :D
 
 ### Annotations
