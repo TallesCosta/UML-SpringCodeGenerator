@@ -44,5 +44,5 @@ That said, there are some requirements that need to be met so this project works
 >
 > It doesn't matter how mush you try, you alone can't change the world. 
 > But that is the beautiful side os the world.
-> - L
+> -- L
 >
