@@ -1,0 +1,12 @@
+<%  if(c.hasStereotype("entity") && !c.hasStereotype("abstract")) { %>
+package ${c.owner.getFullyQualifiedName(".")}.service;
+<% service.setup(c) %>${service.imports()}
+@Service
+public class ${c.name}Service {
+${service.attributes()}
+
+${service.constructor()}
+
+${service.methods()}
+}
+<% } %>

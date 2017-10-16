@@ -17,7 +17,7 @@ class Domain {
 
 			// Attribute isn't a relation? OR
 			// Attribute is relation and owning side?
-			if (!it.isRelation() || it.otherSide.name.isEmpty()
+			if (!it.isRelation() || !it.name.isEmpty()
 				&& it.isOneToOne()) {
 				// Primitive and simple association attributes
 				attributes.push(it)
@@ -34,7 +34,7 @@ class Domain {
 		String result = "";
 
 		if (!attributesList.isEmpty())
-			result += "import java.util.list;";
+			result += "import java.util.List;";
 
 		return result.equals("") ? "" : "\n${result}\n" ;
 	}
@@ -79,7 +79,7 @@ class Domain {
 	}
 
 	def attributes() {
-		if(attributes.isEmpty() || attributesList.isEmpty())
+		if(attributes.isEmpty() && attributesList.isEmpty())
 			return ""
 
 		String result = "\t// Attributes\n"
@@ -96,7 +96,7 @@ class Domain {
 	}
 
 	def constructors() {
-		if(attributes.isEmpty() || attributesList.isEmpty())
+		if(attributes.isEmpty() && attributesList.isEmpty())
 			return ""
 
 		String result = "\t// Constructors\n"
@@ -134,7 +134,7 @@ class Domain {
 	}
 
 	def gets() {
-		if(attributes.isEmpty() || attributesList.isEmpty())
+		if(attributes.isEmpty() && attributesList.isEmpty())
 			return ""
 
 		String result = "\t// Getters\n"
@@ -143,17 +143,25 @@ class Domain {
 			result += "\tpublic ${it.dataType.name} get${it.name.capitalize()}() {\n\t\treturn ${it.name};\n\t}\n\n"
 		}
 
+		attributesList.each {
+			result += "\tpublic List<${it.dataType.name}> get${it.name.capitalize()}() {\n\t\treturn ${it.name};\n\t}\n\n"
+		}
+
 		return result
 	}
 
 	def sets() {
-		if(attributes.isEmpty() || attributesList.isEmpty())
+		if(attributes.isEmpty() && attributesList.isEmpty())
 			return ""
 
 		String result = "\t// Setters\n"
 
 		attributes.each {
 			result += "\tpublic void set${it.name.capitalize()}(${it.dataType.name} ${it.name}) {\n\t\tthis.${it.name} = ${it.name};\n\t}\n\n"
+		}
+
+		attributesList.each {
+			result += "\tpublic void set${it.name.capitalize()}(List<${it.dataType.name}> ${it.name}) {\n\t\tthis.${it.name} = ${it.name};\n\t}\n\n"
 		}
 
 		return result
