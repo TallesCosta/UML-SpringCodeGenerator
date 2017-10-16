@@ -40,12 +40,3 @@ As with any other internally used plugin, there are no intentions of making thes
 That said, there are some requirements that need to be met so this project works just fine:
 * All classes that you expect to be "rendered" need to be, and that's **very** important, **inside** a package ob Astah;
 * [Associations](http://www.uml-diagrams.org/association.html) **must** be named and have a cardinality defined.
-
-
-
-
->
-> It doesn't matter how mush you try, you alone can't change the world. 
-> But that is the beautiful side os the world.
-> -- L
->
