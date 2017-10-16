@@ -40,5 +40,5 @@ Our templates create _automagically_ a lot of boilerplate code, based on those a
 
 As with any other internally used plugin, there are no intentions of making these Anycode templates fully abstract and reusable, there will always exist some limitations that we consider to be acceptable. 
 That said, there are some requirements that need to be met so this project works just fine:
-* All classes that you expect to be "rendered" need to be, and that's **very** important, **inside** a package ob Astah;
+* All classes that you expect to be "rendered" need to be, and that's **very** important, **inside** a package of Astah;
 * [Associations](http://www.uml-diagrams.org/association.html) **must** be named and have a cardinality defined.
