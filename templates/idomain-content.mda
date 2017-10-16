@@ -1,9 +1,0 @@
-<% if(c.hasStereotype("interface")) { %>
-package ${c.owner.getFullyQualifiedName(".")};
-<% idomain.setup(c) %>${idomain.imports()}
-${idomain.qualifier()} interface ${c.name}${idomain.inheritages()} {
-
-${idomain.methods()}
-
-}
-<% } %>
