@@ -4,11 +4,11 @@ import in.labulle.anycode.engine.groovy.directive.*
 
 class Domain {
 	JavaDirective java = new JavaDirective()
-	IClass c;
+	IClassifier c;
 	List<IAttribute> attributes;
 	List<IAttribute> attributesList;
 
-	def setup(IClass c) {
+	def setup(IClassifier c) {
 		this.c = c;
 		this.attributes = new ArrayList<IAttribute>()
 		this.attributesList = new ArrayList<IAttribute>()
@@ -28,6 +28,36 @@ class Domain {
 				attributesList.push(it)
 			}
 		}
+	}
+
+	def type() {
+		if(isInterface(c))
+			return "interface"
+		else if(isClass(c))
+			return "class"
+		return "quedrogaehessa"
+	}
+
+	def name(IClassifier c) {
+		if(isInterface(c))
+			return "I${c.name}"
+		else if(isClass(c))
+			return "${c.name}"
+	}
+
+	def name() {
+		if(isInterface(c))
+			return "I${c.name}"
+		else if(isClass(c))
+			return "${c.name}"
+	}
+
+	def isClass(IClassifier classifier) {
+		return classifier instanceof IClass
+	}
+
+	def isInterface(IClassifier classifier) {
+		return classifier instanceof IInterface
 	}
 
 	def imports() {
@@ -64,7 +94,7 @@ class Domain {
 			result = result.substring(0, result.length() - 1)
 		}
 
-		//if (c instanceof IClass) {
+		if (c instanceof IClass) {
 			if(!c.realizations.isEmpty()) {
 				result += " implements"
 				c.realizations.each {
@@ -73,7 +103,7 @@ class Domain {
 
 				result = result.substring(0, result.length() - 1)
 			}
-		//}
+		}
 
 		return result
 	}
@@ -171,7 +201,12 @@ class Domain {
 		if(c.operations.isEmpty())
 			return ""
 
-		String result = "\t// Methods\n"
+		String result = ""
+
+		if(isClass()) 
+			result += "\t// Methods\n"
+		else 
+			result = "\t// Method Signatures\n"
 
 		c.operations.each {
 			result += "\t${it.visibility.toString().toLowerCase()} ${it.returnType.name} ${it.name}("
@@ -183,9 +218,14 @@ class Domain {
 			if (!it.parameters.isEmpty())
 				result = result.substring(0, result.length() - 2)
 
-			result += ") {\n"
-			result += "\t\t\n"
-			result += "\t}\n\n"
+			// Close method scope if class
+			if(isClass()) {
+				result += ") {\n"
+				result += "\t\t\n"
+				result += "\t}\n\n"
+			}
+			// Close method signature if interface
+			else result += ");\n\n"
 		}
 
 		return result
