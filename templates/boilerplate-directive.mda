@@ -48,8 +48,8 @@ class Boilerplate {
 		String tableClasses = f == BOOTSTRAP? "table table-striped table-bordered" :
 								f == SEMANTIC_UI? "ui celled table" : ""
 
-		String tableHeader = print(3, "<tr>")
-		String placeholder = print(3, "<tr>")
+		String tableHeader = openTag(3, "tr")
+		String placeholder = openTag(3, "tr")
 
 		attributes.plus(listAttributes).each {
 			String content = it.dataType.name == "String"? "Placeholder" :
@@ -61,24 +61,27 @@ class Boilerplate {
 			tableHeader += print(4, "<th>${it.name.capitalize()}</th>")
 		}
 
-		placeholder += print(3, "<tr>")
-		tableHeader += print(3, "</tr>")
+		placeholder += closeTag(3, "tr")
+		tableHeader += closeTag(3, "tr")
 
 
-		String result = print(1, "<h1>DataTable using ${f} </h1>")
+		String result = print(1, "<h1>DataTable using ${f}</h1>")
 
-		result += print(1, "<table id='${c.name.toLowerCase()}-form' class='${tableClasses}' cellspacing='0' width='100%'>")
-		result += print(2, "<thead>")
+		result += openTag(1, "table", "id='${c.name.toLowerCase()}-form' class='${tableClasses}' cellspacing='0' width='100%'")
+
+		result += openTag(2, "thead")
 		result += print(tableHeader)
-		result += print(2, "</thead>")
-		result += print(2, "<tfoot>")
+		result += closeTag(2, "thead")
+
+		result += openTag(2, "tfoot")
 		result += print(tableHeader)
-		result += print(2, "</tfoot>")
-		result += print(2, "<tbody>")
+		result += closeTag(2, "tfoot")
+
+		result += openTag(2, "tbody")
 		result += print(placeholder)
-		result += print(2, "</tbody>")
+		result += closeTag(2, "tbody")
 
-		result += print(1, "</table>")
+		result += closeTag(1, "table")
 
 		return result
 	}
@@ -94,12 +97,54 @@ class Boilerplate {
 			imports += print(1, "<script src='https://cdn.datatables.net/1.10.16/js/dataTables.semanticui.min.js'></script>")
 		}
 
-		imports += print(1, "<script>")
+		imports += openTag(1, "script")
 		imports += print(2, "\$(document).ready(function() {")
 		imports += print(3, "\$('#${c.name.toLowerCase()}-form').DataTable()")
 		imports += print(2, "})")
-		imports += print(1, "</script>")
+		imports += closeTag(1, "script")
 		return imports
+	}
+
+	def form() {
+		String form = ""
+
+		form += print(1, "<>")
+
+		return form
+	}
+
+	def buildTextField(IAttribute attr) {
+		String field = ""
+
+		if(f == SEMANTIC_UI) {
+
+		} else if(f == BOOTSTRAP) {
+
+		}
+
+		return field
+	}
+
+	def closeTag(int indentation, String tag) {
+		return openTag(indentation, "/${tag}")
+	}
+
+	def closeTag(String tag) {
+		return closeTag(0, tag)
+	}
+
+	def openTag(int indentation, String tag, String content) {
+		if(content != "")
+			content = " ${content}"
+		return print(indentation, "<${tag}${content}>")
+	}
+
+	def openTag(int indentation, String tag) {
+		return openTag(indentation, tag, "")
+	}
+
+	def openTag(String tag) {
+		return openTag(0, tag)
 	}
 
 	def print(String text) {
