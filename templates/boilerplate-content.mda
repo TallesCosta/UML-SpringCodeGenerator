@@ -1,10 +1,11 @@
 <%  if(c.hasStereotype("entity")) { %>
+<!DOCTYPE html>
 <html>
 <head>
 	<title>${c.name} Boilerplate!</title>
+	${boilerplate.setup(c, boilerplate.BOOTSTRAP)}
 </head>
 <body>
-<% boilerplate.setup(c, "bootstrap4") %>
 
 <!-- DATATABLE TABLE HTML EXAMPLE -->
 ${boilerplate.tableHtml()}

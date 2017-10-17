@@ -3,6 +3,9 @@ import in.labulle.anycode.uml.*
 import in.labulle.anycode.engine.groovy.directive.*
 
 class Boilerplate {
+
+	static String SEMANTIC_UI = "semanticui",
+		BOOTSTRAP = "bootstrap4"
 	IClassifier c;
 	List<IAttribute> attributes;
 	List<IAttribute> listAttributes;
@@ -22,6 +25,19 @@ class Boilerplate {
 			else if (it.isRelation() && it.isOneToMany())
 				listAttributes.push(it)
 		}
+
+		String imports = ""
+		imports += print("<link rel='stylesheets' href='https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css' />")
+
+		if(f == BOOTSTRAP) {
+			imports += print(1, "<link rel='stylesheets' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap.css' />")
+			imports += print(1, "<link rel='stylesheets' href='https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css' />")
+		} else if(f == SEMANTIC_UI) {
+			imports += print(1, "<link rel='stylesheets' href='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css' />")
+			imports += print(1, "<link rel='stylesheets' href='https://cdn.datatables.net/1.10.16/css/dataTables.semanticui.min.css' />")
+		}
+
+		return imports.substring(0, imports.length() - 1)
 	}
 
 	def setup(IClassifier c) {
@@ -29,46 +45,61 @@ class Boilerplate {
 	}
 
 	def tableHtml() {
-		String tableClasses = f == "bootstrap4"? "table table-striped table-bordered" :
-								f == "semantic"? "ui celled table" : ""
+		String tableClasses = f == BOOTSTRAP? "table table-striped table-bordered" :
+								f == SEMANTIC_UI? "ui celled table" : ""
 
-		String tableHeader = print(2, "<tr>")
-		String placeholder = print(2, "<tr>")
+		String tableHeader = print(3, "<tr>")
+		String placeholder = print(3, "<tr>")
 
 		attributes.plus(listAttributes).each {
 			String content = it.dataType.name == "String"? "Placeholder" :
 							it.dataType.name == "int"? "123" :
 							it.dataType.name == "double"? "12,3" : "List&lt;${it.name.capitalize()}&gt;"
 
-			placeholder += print(3, "<td>${content}</td>")
+			placeholder += print(4, "<td>${content}</td>")
 
-			tableHeader += print(3, "<th>${it.name.capitalize()}</th>")
+			tableHeader += print(4, "<th>${it.name.capitalize()}</th>")
 		}
 
-		placeholder += print(2, "<tr>")
-		tableHeader += print(2, "</tr>")
+		placeholder += print(3, "<tr>")
+		tableHeader += print(3, "</tr>")
 
 
-		String result = "<!-- USING ${f} -->\n"
+		String result = print(1, "<h1>DataTable using ${f} </h1>")
 
-		result += print("<table id='${c.name.toLowerCase()}-form' class='${tableClasses}' cellspacing='0' width='100%'>")
-		result += print(1, "<thead>")
+		result += print(1, "<table id='${c.name.toLowerCase()}-form' class='${tableClasses}' cellspacing='0' width='100%'>")
+		result += print(2, "<thead>")
 		result += print(tableHeader)
-		result += print(1, "</thead>")
-		result += print(1, "<tfoot>")
+		result += print(2, "</thead>")
+		result += print(2, "<tfoot>")
 		result += print(tableHeader)
-		result += print(1, "</tfoot>")
-		result += print(1, "<tbody>")
+		result += print(2, "</tfoot>")
+		result += print(2, "<tbody>")
 		result += print(placeholder)
-		result += print(1, "</tbody>")
+		result += print(2, "</tbody>")
 
-		result += print("</table>")
+		result += print(1, "</table>")
 
 		return result
 	}
 
 	def tableJs() {
+		String imports = print(1, "<script src='https://code.jquery.com/jquery-3.2.1.min.js'></script>")
+		imports += print(1, "<script src='https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js'></script>")
 
+		if(f == BOOTSTRAP)
+			imports += print(1, "<script src='https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js'></script>")
+		else if(f == SEMANTIC_UI) {
+			imports += print(1, "<script src='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js'></script>")
+			imports += print(1, "<script src='https://cdn.datatables.net/1.10.16/js/dataTables.semanticui.min.js'></script>")
+		}
+
+		imports += print(1, "<script>")
+		imports += print(2, "\$(document).ready(function() {")
+		imports += print(3, "\$('#${c.name.toLowerCase()}-form').DataTable()")
+		imports += print(2, "})")
+		imports += print(1, "</script>")
+		return imports
 	}
 
 	def print(String text) {
