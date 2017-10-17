@@ -1,0 +1,11 @@
+<%  if(c.hasStereotype("entity") && !c.hasStereotype("abstract")) { %>
+package ${c.owner.getFullyQualifiedName(".")}.controller;
+<% controller.setup(c) %>${controller.imports()}
+@Controller
+public class ${c.name}Controller {
+
+${controller.constructor()}
+
+${controller.methods()}
+}
+<% } %>

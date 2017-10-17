@@ -1,0 +1,58 @@
+import java.util.*
+import in.labulle.anycode.uml.*
+import in.labulle.anycode.engine.groovy.directive.*
+
+class Controller {
+	IClass c;
+
+	def setup(IClass c) {
+		this.c = c;
+	}
+
+	def constructor() {
+		String result = ""
+		
+		result += "\tpublic ${c.name}Controller() {\n"
+		result += "\t\t\n"
+		result += "\t}"
+		
+		return result
+	}
+
+	def imports() {
+		String result = ""
+
+		result += "\nimport org.springframework.stereotype.Controller;\n"
+		result += "\nimport ${c.owner.getFullyQualifiedName(".")}.repository.${c.name}Repository;\n"
+
+		return result
+	}
+
+	def methods() {
+		String result = ""
+		String resource = c.name.substring(0, 1).toLowerCase() + c.name.substring(1, c.name.length());
+
+		// Display form to create/update resource
+		result += "\t@RequestMapping(path = {\"/new\", \"/edit\"}, method = RequestMethod.GET)\n"
+		result += "\tpublic ModelAndView form(${c.name} ${resource}, RedirectAttributes redirectAttributes) {\n"
+		result += "\t\tModelAndView mv = new ModelAndView(\"${c.name.substring(0, 1).toLowerCase()}${c.name.substring(1, c.name.length())}/list\");\n"
+		result += "\t\tmv.addObject(\"${resource}\", ${resource});\n"
+		result += "\t\t\n"
+		result += "\t\tif (redirectAttributes.getFlashAttributes().get(\"message\") != null)\n"
+		result += "\t\t\tmv.addObject(\"message\", redirectAttributes.getFlashAttributes().get(\"message\"));\n"
+		result += "\t\t\tmv.addObject(\"alertClass\", redirectAttributes.getFlashAttributes().get(\"alertClass\"));\n"
+		result += "\t\t}\n"
+		result += "\t\t\n"
+		result += "\t\treturn mv;\n"
+		result += "\t}\n\n"
+
+		// List resource
+		result += "\t@RequestMapping(method = RequestMethod.GET)\n"
+		result += "\tpublic ModelAndView list() {\n"
+		result += "\t\treturn new ModelAndView(\"${c.name.substring(0, 1).toLowerCase()}${c.name.substring(1, c.name.length())}/list\");\n"
+		result += "\t}\n\n"
+
+		return result
+	}
+
+}
