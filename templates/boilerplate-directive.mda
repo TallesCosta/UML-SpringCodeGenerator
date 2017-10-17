@@ -5,28 +5,88 @@ import in.labulle.anycode.engine.groovy.directive.*
 class Boilerplate {
 	IClassifier c;
 	List<IAttribute> attributes;
-	List<IAttribute> attributesList;
+	List<IAttribute> listAttributes;
 
-	def setup(IClassifier c) {
+	String f;
+
+	def setup(IClassifier c, String framework) {
 		this.c = c;
+		this.f = framework;
 		this.attributes = new ArrayList<IAttribute>()
-		this.attributesList = new ArrayList<IAttribute>()
+		this.listAttributes = new ArrayList<IAttribute>()
 
 		c.attributes.each {
 			if (!it.isRelation() || !it.name.isEmpty() && it.isOneToOne())
 				attributes.push(it)
 
 			else if (it.isRelation() && it.isOneToMany())
-				attributesList.push(it)
+				listAttributes.push(it)
 		}
 	}
 
-	def tableHtml() {
+	def setup(IClassifier c) {
+		setup(c, "")
+	}
 
+	def tableHtml() {
+		String tableClasses = f == "bootstrap4"? "table table-striped table-bordered" :
+								f == "semantic"? "ui celled table" : ""
+
+		String tableHeader = print(2, "<tr>")
+		String placeholder = print(2, "<tr>")
+
+		attributes.plus(listAttributes).each {
+			String content = it.dataType.name == "String"? "Placeholder" :
+							it.dataType.name == "int"? "123" :
+							it.dataType.name == "double"? "12,3" : "List&lt;${it.name.capitalize()}&gt;"
+
+			placeholder += print(3, "<td>${content}</td>")
+
+			tableHeader += print(3, "<th>${it.name.capitalize()}</th>")
+		}
+
+		placeholder += print(2, "<tr>")
+		tableHeader += print(2, "</tr>")
+
+
+		String result = "<!-- USING ${f} -->\n"
+
+		result += print("<table id='${c.name.toLowerCase()}-form' class='${tableClasses}' cellspacing='0' width='100%'>")
+		result += print(1, "<thead>")
+		result += print(tableHeader)
+		result += print(1, "</thead>")
+		result += print(1, "<tfoot>")
+		result += print(tableHeader)
+		result += print(1, "</tfoot>")
+		result += print(1, "<tbody>")
+		result += print(placeholder)
+		result += print(1, "</tbody>")
+
+		result += print("</table>")
+
+		return result
 	}
 
 	def tableJs() {
-		
+
+	}
+
+	def print(String text) {
+		return print(0, text)
+	}
+
+	def print(int indentation, String text) {
+		String res = ""
+
+		while(indentation > 0) {
+			res += "\t"
+			indentation--
+		}
+
+		if(text.substring(text.length() - 1) == "\n")
+			return res + text
+
+		return res + text + "\n"
 	}
 
 }
