@@ -1,0 +1,32 @@
+import java.util.*
+import in.labulle.anycode.uml.*
+import in.labulle.anycode.engine.groovy.directive.*
+
+class Boilerplate {
+	IClassifier c;
+	List<IAttribute> attributes;
+	List<IAttribute> attributesList;
+
+	def setup(IClassifier c) {
+		this.c = c;
+		this.attributes = new ArrayList<IAttribute>()
+		this.attributesList = new ArrayList<IAttribute>()
+
+		c.attributes.each {
+			if (!it.isRelation() || !it.name.isEmpty() && it.isOneToOne())
+				attributes.push(it)
+
+			else if (it.isRelation() && it.isOneToMany())
+				attributesList.push(it)
+		}
+	}
+
+	def tableHtml() {
+
+	}
+
+	def tableJs() {
+		
+	}
+
+}
