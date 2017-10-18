@@ -11,10 +11,12 @@ class Boilerplate {
 	List<IAttribute> listAttributes;
 
 	String f;
+	int numberOfResults;
 
-	def setup(IClassifier c, String framework) {
+	def setup(IClassifier c, String framework, int numberOfResults) {
 		this.c = c;
 		this.f = framework;
+		this.numberOfResults = numberOfResults
 		this.attributes = new ArrayList<IAttribute>()
 		this.listAttributes = new ArrayList<IAttribute>()
 
@@ -27,21 +29,52 @@ class Boilerplate {
 		}
 
 		String imports = ""
-		imports += print("<link rel='stylesheets' href='https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css' />")
+		
 
 		if(f == BOOTSTRAP) {
-			imports += print(1, "<link rel='stylesheets' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap.css' />")
-			imports += print(1, "<link rel='stylesheets' href='https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css' />")
+			imports += buildLinkStylesheet("https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap.css")
+			imports += buildLinkStylesheet(1, "https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css")
 		} else if(f == SEMANTIC_UI) {
-			imports += print(1, "<link rel='stylesheets' href='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css' />")
-			imports += print(1, "<link rel='stylesheets' href='https://cdn.datatables.net/1.10.16/css/dataTables.semanticui.min.css' />")
-		}
+			imports += buildLinkStylesheet("https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css")
+			imports += buildLinkStylesheet(1, "https://cdn.datatables.net/1.10.16/css/dataTables.semanticui.min.css")
+		} else
+			imports += buildLinkStylesheet("https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css")
+
+		imports += buildLinkStylesheet(1, "https://cdn.datatables.net/responsive/2.2.0/css/responsive.dataTables.min.css")
 
 		return imports.substring(0, imports.length() - 1)
 	}
 
 	def setup(IClassifier c) {
 		setup(c, "")
+	}
+
+	def startBody() {
+		String start = ""
+
+		if(f == SEMANTIC_UI) {
+			start += openTag(1, "div", "class='ui container'")
+		} else if(f == BOOTSTRAP) {
+			start += openTag(1, "div", "class='container'")
+		}
+
+		return start
+	}
+
+	def header() {
+		return print(1, "<h1>${f.capitalize()}</h1>")
+	}
+
+	def endBody() {
+		String end = ""
+
+		if(f == SEMANTIC_UI) {
+			end += closeTag(1, "div")
+		} else if(f == BOOTSTRAP) {
+			end += closeTag(1, "div")
+		}
+
+		return end
 	}
 
 	def tableHtml() {
@@ -64,10 +97,7 @@ class Boilerplate {
 		placeholder += closeTag(3, "tr")
 		tableHeader += closeTag(3, "tr")
 
-
-		String result = print(1, "<h1>DataTable using ${f}</h1>")
-
-		result += openTag(1, "table", "id='${c.name.toLowerCase()}-form' class='${tableClasses}' cellspacing='0' width='100%'")
+		String result = openTag(1, "table", "id='${c.name.toLowerCase()}-form' class='${tableClasses}' cellspacing='0' width='100%'")
 
 		result += openTag(2, "thead")
 		result += print(tableHeader)
@@ -78,7 +108,10 @@ class Boilerplate {
 		result += closeTag(2, "tfoot")
 
 		result += openTag(2, "tbody")
-		result += print(placeholder)
+
+		for(int i = 0; i < numberOfResults; i++)
+			result += print(placeholder)
+			
 		result += closeTag(2, "tbody")
 
 		result += closeTag(1, "table")
@@ -89,6 +122,7 @@ class Boilerplate {
 	def tableJs() {
 		String imports = print(1, "<script src='https://code.jquery.com/jquery-3.2.1.min.js'></script>")
 		imports += print(1, "<script src='https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js'></script>")
+		imports += print(1, "<script src='https://cdn.datatables.net/responsive/2.2.0/js/dataTables.responsive.min.js'></script>")
 
 		if(f == BOOTSTRAP)
 			imports += print(1, "<script src='https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js'></script>")
@@ -99,30 +133,57 @@ class Boilerplate {
 
 		imports += openTag(1, "script")
 		imports += print(2, "\$(document).ready(function() {")
-		imports += print(3, "\$('#${c.name.toLowerCase()}-form').DataTable()")
+		imports += print(3, "\$('#${c.name.toLowerCase()}-form').DataTable({")
+		imports += print(4, "responsive: true")
+		imports += print(3, "})")
 		imports += print(2, "})")
 		imports += closeTag(1, "script")
 		return imports
 	}
 
 	def form() {
-		String form = ""
+		String formClasses = f == SEMANTIC_UI? "class='ui form'" : ""
 
-		form += print(1, "<>")
+		String fieldClasses = f == SEMANTIC_UI? "class='field'" : 
+							  f == BOOTSTRAP? "class='form-group'" : ""
+		
+		String form = openTag(1, "form", formClasses)
+
+		attributes.each {
+			form += openTag(2, "div", fieldClasses)
+			form += inlineTag(3, "label", it.name.capitalize(), (f == BOOTSTRAP? "for='${it.name}'" : ""))
+			form += print(3, buildTextField(it))
+			form += closeTag(2, "div")
+		}
+
+		form += closeTag(1, "form")
 
 		return form
 	}
 
 	def buildTextField(IAttribute attr) {
-		String field = ""
+		String id = f == BOOTSTRAP? " id='${attr.name}' " : " "
+		String clazz = f == BOOTSTRAP? " class='form-control' " : " "
 
-		if(f == SEMANTIC_UI) {
+		return "<input type='text'${clazz}name='${attr.name}'${id}placeholder='${attr.name.capitalize()}' />"
+	}
 
-		} else if(f == BOOTSTRAP) {
+	def buildLinkStylesheet(int indentation, String url) {
+		return print(indentation, "<link rel='stylesheet' href='${url}' />")
+	}
 
-		}
+	def buildLinkStylesheet(String url) {
+		return buildLinkStylesheet(0, url)
+	}
 
-		return field
+	def inlineTag(int indentation, String tag, String content, String props) {
+		String open = openTag(0, tag, props)
+		String result = open.substring(0, open.length() - 1) + content + closeTag(tag)
+		return print(indentation, result)
+	}
+
+	def inlineTag(int indentation, String tag, String content) {
+		return inlineTag(indentation, tag, content, "")
 	}
 
 	def closeTag(int indentation, String tag) {
@@ -133,10 +194,10 @@ class Boilerplate {
 		return closeTag(0, tag)
 	}
 
-	def openTag(int indentation, String tag, String content) {
-		if(content != "")
-			content = " ${content}"
-		return print(indentation, "<${tag}${content}>")
+	def openTag(int indentation, String tag, String props) {
+		if(props != "")
+			props = " ${props}"
+		return print(indentation, "<${tag}${props}>")
 	}
 
 	def openTag(int indentation, String tag) {

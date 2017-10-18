@@ -3,16 +3,20 @@
 <html>
 <head>
 	<title>${c.name} Boilerplate!</title>
-	${boilerplate.setup(c, boilerplate.BOOTSTRAP)}
+	${boilerplate.setup(c, boilerplate.BOOTSTRAP, 1)}
 </head>
 <body>
+${boilerplate.startBody()}
+${boilerplate.header()}
+<!-- FORM EXAMPLE -->
+${boilerplate.form()}
 
 <!-- DATATABLE TABLE HTML EXAMPLE -->
 ${boilerplate.tableHtml()}
 
 <!-- DATATABLE TABLE JS EXAMPLE -->
 ${boilerplate.tableJs()}
-
+${boilerplate.endBody()}
 </body>
 </html>
 <% } %>
