@@ -4,18 +4,17 @@ import in.labulle.anycode.engine.groovy.directive.*
 
 class Boilerplate {
 
-	static String SEMANTIC_UI = "semanticui",
-		BOOTSTRAP = "bootstrap4"
+	static String SEMANTIC_UI = "semanticui", BOOTSTRAP = "bootstrap4"
 	IClassifier c;
 	List<IAttribute> attributes;
 	List<IAttribute> listAttributes;
 
-	String f;
+	String framework;
 	int numberOfResults;
 
 	def setup(IClassifier c, String framework, int numberOfResults) {
 		this.c = c;
-		this.f = framework;
+		this.framework = framework;
 		this.numberOfResults = numberOfResults
 		this.attributes = new ArrayList<IAttribute>()
 		this.listAttributes = new ArrayList<IAttribute>()
@@ -31,10 +30,10 @@ class Boilerplate {
 		String imports = ""
 		
 
-		if(f == BOOTSTRAP) {
+		if(framework == BOOTSTRAP) {
 			imports += buildLinkStylesheet("https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap.css")
 			imports += buildLinkStylesheet(1, "https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css")
-		} else if(f == SEMANTIC_UI) {
+		} else if(framework == SEMANTIC_UI) {
 			imports += buildLinkStylesheet("https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css")
 			imports += buildLinkStylesheet(1, "https://cdn.datatables.net/1.10.16/css/dataTables.semanticui.min.css")
 		} else
@@ -52,34 +51,72 @@ class Boilerplate {
 	def startBody() {
 		String start = ""
 
-		if(f == SEMANTIC_UI) {
-			start += openTag(1, "div", "class='ui container'")
-		} else if(f == BOOTSTRAP) {
-			start += openTag(1, "div", "class='container'")
+		if(framework == SEMANTIC_UI) {
+			start += openTag(0, "div", "class='ui container'")
+		} else if(framework == BOOTSTRAP) {
+			start += openTag(0, "div", "class='container'")
 		}
 
 		return start
 	}
 
 	def header() {
-		return print(1, "<h1>${f.capitalize()}</h1>")
+		if(framework == SEMANTIC_UI) {
+			String header = ""
+			header += startContainer()
+		}
+		return print(1, "<h1>${framework.capitalize()}</h1>")
 	}
 
 	def endBody() {
 		String end = ""
 
-		if(f == SEMANTIC_UI) {
-			end += closeTag(1, "div")
-		} else if(f == BOOTSTRAP) {
-			end += closeTag(1, "div")
+		if(framework == SEMANTIC_UI) {
+			end += endContainer()
+		} else if(framework == BOOTSTRAP) {
+			end += closeTag("div")
 		}
 
 		return end
 	}
 
+	def form() {
+		String formClasses = framework == SEMANTIC_UI? "class='ui form'" : ""
+
+		String fieldClasses = framework == SEMANTIC_UI? "class='field'" : 
+							  framework == BOOTSTRAP? "class='form-group'" : ""
+
+		String buttonClasses = framework == SEMANTIC_UI? " class='ui button primary right floated'" : 
+							  framework == BOOTSTRAP? "class='btn btn-primary float-right'" : ""
+
+		String form = buildSectionHeader("Form")
+
+		form += openTag(1, "form", formClasses)
+
+		attributes.each {
+			form += openTag(2, "div", fieldClasses)
+			form += inlineTag(3, "label", it.name.capitalize(), (framework == BOOTSTRAP? "for='${it.name}'" : ""))
+			form += print(3, buildTextField(it))
+			form += closeTag(2, "div")
+		}
+
+		form += inlineTag(2, "button", "Submit", "type='submit'${buttonClasses}")
+		form += closeTag(1, "form")
+		form += buildSectionHeaderEnd()
+
+		return form
+	}
+
+	def buildTextField(IAttribute attr) {
+		String id = framework == BOOTSTRAP? " id='${attr.name}' " : " "
+		String clazz = framework == BOOTSTRAP? " class='form-control' " : " "
+
+		return "<input type='text'${clazz}name='${attr.name}'${id}placeholder='${attr.name.capitalize()}' />"
+	}
+
 	def tableHtml() {
-		String tableClasses = f == BOOTSTRAP? "table table-striped table-bordered" :
-								f == SEMANTIC_UI? "ui celled table" : ""
+		String tableClasses = framework == BOOTSTRAP? "table table-striped table-bordered" :
+								framework == SEMANTIC_UI? "ui celled table" : ""
 
 		String tableHeader = openTag(3, "tr")
 		String placeholder = openTag(3, "tr")
@@ -97,7 +134,9 @@ class Boilerplate {
 		placeholder += closeTag(3, "tr")
 		tableHeader += closeTag(3, "tr")
 
-		String result = openTag(1, "table", "id='${c.name.toLowerCase()}-form' class='${tableClasses}' cellspacing='0' width='100%'")
+		String result = buildSectionHeader("Table")
+
+		result += openTag(1, "table", "id='${c.name.toLowerCase()}-form' class='${tableClasses}' cellspacing='0' width='100%'")
 
 		result += openTag(2, "thead")
 		result += print(tableHeader)
@@ -115,18 +154,33 @@ class Boilerplate {
 		result += closeTag(2, "tbody")
 
 		result += closeTag(1, "table")
+		result += buildSectionHeaderEnd()
 
 		return result
 	}
 
 	def tableJs() {
+		String jsAction = ""
+		if(framework == SEMANTIC_UI) {
+			jsAction += print(3, "\$('form button[type=submit]').click(function() {")
+			jsAction += print(4, "let self = \$(this)")
+			jsAction += print(4, "\$('form').addClass('loading')")
+			jsAction += print(4, "self.addClass('disabled')")
+			jsAction += print(4, "setTimeout(() => {")
+			jsAction += print(5, "\$(this).removeClass('disabled')")
+			jsAction += print(5, "\$('form').removeClass('loading')")
+			jsAction += print(4, "}, 3500)")
+			jsAction += print(4, "return false")
+			jsAction += print(3, "})")
+		}
+
 		String imports = print(1, "<script src='https://code.jquery.com/jquery-3.2.1.min.js'></script>")
 		imports += print(1, "<script src='https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js'></script>")
 		imports += print(1, "<script src='https://cdn.datatables.net/responsive/2.2.0/js/dataTables.responsive.min.js'></script>")
 
-		if(f == BOOTSTRAP)
+		if(framework == BOOTSTRAP)
 			imports += print(1, "<script src='https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js'></script>")
-		else if(f == SEMANTIC_UI) {
+		else if(framework == SEMANTIC_UI) {
 			imports += print(1, "<script src='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js'></script>")
 			imports += print(1, "<script src='https://cdn.datatables.net/1.10.16/js/dataTables.semanticui.min.js'></script>")
 		}
@@ -136,36 +190,58 @@ class Boilerplate {
 		imports += print(3, "\$('#${c.name.toLowerCase()}-form').DataTable({")
 		imports += print(4, "responsive: true")
 		imports += print(3, "})")
+
+		if(jsAction != "")
+			imports += jsAction
+
 		imports += print(2, "})")
 		imports += closeTag(1, "script")
 		return imports
 	}
 
-	def form() {
-		String formClasses = f == SEMANTIC_UI? "class='ui form'" : ""
+	def buildSectionHeader(String title) {
+		String section = ""
 
-		String fieldClasses = f == SEMANTIC_UI? "class='field'" : 
-							  f == BOOTSTRAP? "class='form-group'" : ""
-		
-		String form = openTag(1, "form", formClasses)
-
-		attributes.each {
-			form += openTag(2, "div", fieldClasses)
-			form += inlineTag(3, "label", it.name.capitalize(), (f == BOOTSTRAP? "for='${it.name}'" : ""))
-			form += print(3, buildTextField(it))
-			form += closeTag(2, "div")
+		if(framework == SEMANTIC_UI) {
+			section += inlineTag(1, "h5", title.capitalize(), "class='ui top attached header'")
+			section += openTag(1, "div", "class='ui segment padded attached clearing'")
+		} else if(framework == BOOTSTRAP) {
+			section += openTag(1, "div", "class='card clearfix mt-2 p-1'")
+			section += openTag(1, "ul", "class='list-group list-group-flush'")
+			section += openTag(1, "li", "class='list-group-item'")
+			section += inlineTag(2, "h5", title.capitalize())
+			section += closeTag(1, "li")
+			section += openTag(1, "li", "class='list-group-item'")
 		}
 
-		form += closeTag(1, "form")
-
-		return form
+		return section
 	}
 
-	def buildTextField(IAttribute attr) {
-		String id = f == BOOTSTRAP? " id='${attr.name}' " : " "
-		String clazz = f == BOOTSTRAP? " class='form-control' " : " "
+	def buildSectionHeaderEnd() {
+		String end = ""
 
-		return "<input type='text'${clazz}name='${attr.name}'${id}placeholder='${attr.name.capitalize()}' />"
+		if(framework == SEMANTIC_UI) {
+			end += closeTag(1, "div")
+		} else if(framework == BOOTSTRAP) {
+			end += closeTag(1, "li")
+			end += closeTag(1, "div")
+		}
+
+		return end
+	}
+
+	def startContainer() {
+		if(framework == SEMANTIC_UI)
+			return openTag(0, "div", "class='ui container'")
+
+		return ""
+	}
+
+	def endContainer() {
+		if(framework == SEMANTIC_UI)
+			return closeTag("div")
+
+		return ""
 	}
 
 	def buildLinkStylesheet(int indentation, String url) {

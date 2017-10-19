@@ -3,7 +3,7 @@
 <html>
 <head>
 	<title>${c.name} Boilerplate!</title>
-	${boilerplate.setup(c, boilerplate.BOOTSTRAP, 1)}
+	${boilerplate.setup(c, boilerplate.SEMANTIC_UI, 1)}
 </head>
 <body>
 ${boilerplate.startBody()}
