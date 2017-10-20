@@ -48,6 +48,10 @@ class Boilerplate {
 		setup(c, "")
 	}
 
+	def commentary(String comment) {
+		return print(1, "<!-- ${comment} -->")
+	}
+
 	def startBody() {
 		String start = ""
 

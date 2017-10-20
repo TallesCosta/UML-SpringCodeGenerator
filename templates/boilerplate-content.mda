@@ -8,13 +8,13 @@
 <body>
 ${boilerplate.startBody()}
 ${boilerplate.header()}
-<!-- FORM EXAMPLE -->
+${boilerplate.commentary("FORM EXAMPLE")}
 ${boilerplate.form()}
 
-<!-- DATATABLE TABLE HTML EXAMPLE -->
+${boilerplate.commentary("DATATABLE TABLE HTML EXAMPLE")}
 ${boilerplate.tableHtml()}
 
-<!-- DATATABLE TABLE JS EXAMPLE -->
+${boilerplate.commentary("DATATABLE TABLE JS EXAMPLE")}
 ${boilerplate.tableJs()}
 ${boilerplate.endBody()}
 </body>
