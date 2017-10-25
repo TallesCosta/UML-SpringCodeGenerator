@@ -1,0 +1,22 @@
+<%  if(c.hasStereotype("entity")) { %>
+<!DOCTYPE html>
+<html>
+<head>
+	<title>${c.name} Boilerplate!</title>
+	${boilerplate.setup(c, boilerplate.BOOTSTRAP, 3)}
+</head>
+<body>
+${boilerplate.startBody()}
+${boilerplate.header()}
+${boilerplate.commentary("FORM EXAMPLE")}
+${boilerplate.form()}
+
+${boilerplate.commentary("DATATABLE TABLE HTML EXAMPLE")}
+${boilerplate.tableHtml()}
+
+${boilerplate.commentary("DATATABLE TABLE JS EXAMPLE")}
+${boilerplate.tableJs()}
+${boilerplate.endBody()}
+</body>
+</html>
+<% } %>

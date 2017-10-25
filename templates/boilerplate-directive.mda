@@ -1,0 +1,303 @@
+import java.util.*
+import in.labulle.anycode.uml.*
+import in.labulle.anycode.engine.groovy.directive.*
+
+class Boilerplate {
+
+	static String SEMANTIC_UI = "Semantic UI", BOOTSTRAP = "Bootstrap 4"
+	IClassifier c;
+	List<IAttribute> attributes;
+	List<IAttribute> listAttributes;
+
+	String framework;
+	int numberOfResults;
+
+	def setup(IClassifier c, String framework, int numberOfResults) {
+		this.c = c;
+		this.framework = framework;
+		this.numberOfResults = numberOfResults
+		this.attributes = new ArrayList<IAttribute>()
+		this.listAttributes = new ArrayList<IAttribute>()
+
+		c.attributes.each {
+			if (!it.isRelation() || !it.name.isEmpty() && it.isOneToOne())
+				attributes.push(it)
+
+			else if (it.isRelation() && it.isOneToMany())
+				listAttributes.push(it)
+		}
+
+		String imports = ""
+		
+
+		if(framework == BOOTSTRAP) {
+			imports += buildLinkStylesheet("https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap.css")
+			imports += buildLinkStylesheet(1, "https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css")
+		} else if(framework == SEMANTIC_UI) {
+			imports += buildLinkStylesheet("https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css")
+			imports += buildLinkStylesheet(1, "https://cdn.datatables.net/1.10.16/css/dataTables.semanticui.min.css")
+		} else
+			imports += buildLinkStylesheet("https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css")
+
+		imports += buildLinkStylesheet(1, "https://cdn.datatables.net/responsive/2.2.0/css/responsive.dataTables.min.css")
+
+		return imports.substring(0, imports.length() - 1)
+	}
+
+	def setup(IClassifier c) {
+		setup(c, "")
+	}
+
+	def commentary(String comment) {
+		return print(1, "<!-- ${comment} -->")
+	}
+
+	def startBody() {
+		String start = ""
+
+		if(framework == SEMANTIC_UI) {
+			start += openTag(0, "div", "class='ui container'")
+		} else if(framework == BOOTSTRAP) {
+			start += openTag(0, "div", "class='container'")
+		}
+
+		return start
+	}
+
+	def header() {
+		String headerClasses = framework == SEMANTIC_UI? "" : ""
+		String header = ""
+
+		if(framework == SEMANTIC_UI) {
+			header += openTag(1, "div", "class='ui masthead basic segment'")
+			header += openTag(1, "h1", "class='ui header'")
+			header += inlineTag(2, "i", "", "class='icon code'")
+			header += inlineTag(2, "div", framework, "class='content'")
+			header += closeTag(1, "h1")
+			header += closeTag(1, "div")
+		} else if(framework == BOOTSTRAP)
+			header += inlineTag(1, "h1", framework)
+
+		return header
+	}
+
+	def endBody() {
+		String end = ""
+
+		if(framework == SEMANTIC_UI) {
+			end += closeTag("div")
+		} else if(framework == BOOTSTRAP) {
+			end += closeTag("div")
+		}
+
+		return end
+	}
+
+	def form() {
+		String formClasses = framework == SEMANTIC_UI? "class='ui form'" : ""
+
+		String fieldClasses = framework == SEMANTIC_UI? "class='field'" : 
+							  framework == BOOTSTRAP? "class='form-group'" : ""
+
+		String buttonClasses = framework == SEMANTIC_UI? " class='ui button primary right floated'" : 
+							  framework == BOOTSTRAP? "class='btn btn-primary float-right'" : ""
+
+		String form = buildSectionHeader("Form")
+
+		form += openTag(1, "form", formClasses)
+
+		attributes.each {
+			form += openTag(2, "div", fieldClasses)
+			form += inlineTag(3, "label", it.name.capitalize(), (framework == BOOTSTRAP? "for='${it.name}'" : ""))
+			form += print(3, buildTextField(it))
+			form += closeTag(2, "div")
+		}
+
+		form += inlineTag(2, "button", "Submit", "type='submit'${buttonClasses}")
+		form += closeTag(1, "form")
+		form += buildSectionHeaderEnd()
+
+		return form
+	}
+
+	def buildTextField(IAttribute attr) {
+		String id = framework == BOOTSTRAP? " id='${attr.name}' " : " "
+		String clazz = framework == BOOTSTRAP? " class='form-control' " : " "
+
+		return "<input type='text'${clazz}name='${attr.name}'${id}placeholder='${attr.name.capitalize()}' />"
+	}
+
+	def tableHtml() {
+		String tableClasses = framework == BOOTSTRAP? "table table-striped table-bordered" :
+								framework == SEMANTIC_UI? "ui celled table" : ""
+
+		String tableHeader = openTag(3, "tr")
+		String placeholder = openTag(3, "tr")
+
+		attributes.plus(listAttributes).each {
+			String content = it.dataType.name == "String"? "Placeholder" :
+							it.dataType.name == "int"? "123" :
+							it.dataType.name == "double"? "12,3" : "List&lt;${it.name.capitalize()}&gt;"
+
+			placeholder += print(4, "<td>${content}</td>")
+
+			tableHeader += print(4, "<th>${it.name.capitalize()}</th>")
+		}
+
+		placeholder += closeTag(3, "tr")
+		tableHeader += closeTag(3, "tr")
+
+		String result = buildSectionHeader("Table")
+
+		result += openTag(1, "table", "id='${c.name.toLowerCase()}-form' class='${tableClasses}' cellspacing='0' width='100%'")
+
+		result += openTag(2, "thead")
+		result += print(tableHeader)
+		result += closeTag(2, "thead")
+
+		result += openTag(2, "tfoot")
+		result += print(tableHeader)
+		result += closeTag(2, "tfoot")
+
+		result += openTag(2, "tbody")
+
+		for(int i = 0; i < numberOfResults; i++)
+			result += print(placeholder)
+			
+		result += closeTag(2, "tbody")
+
+		result += closeTag(1, "table")
+		result += buildSectionHeaderEnd()
+
+		return result
+	}
+
+	def tableJs() {
+		String jsAction = ""
+		jsAction += print(3, "\$('form button[type=submit]').click(function() {")
+		if(framework == SEMANTIC_UI) {
+			jsAction += print(4, "\$('form').addClass('loading')")
+			jsAction += print(4, "\$(this).addClass('disabled')")
+			jsAction += print(4, "setTimeout(() => {")
+			jsAction += print(5, "\$(this).removeClass('disabled')")
+			jsAction += print(5, "\$('form').removeClass('loading')")
+			jsAction += print(4, "}, 3500)")
+		}
+		jsAction += print(4, "return false")
+		jsAction += print(3, "})")
+
+		String imports = print(1, "<script src='https://code.jquery.com/jquery-3.2.1.min.js'></script>")
+		imports += print(1, "<script src='https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js'></script>")
+		imports += print(1, "<script src='https://cdn.datatables.net/responsive/2.2.0/js/dataTables.responsive.min.js'></script>")
+
+		if(framework == BOOTSTRAP)
+			imports += print(1, "<script src='https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js'></script>")
+		else if(framework == SEMANTIC_UI) {
+			imports += print(1, "<script src='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js'></script>")
+			imports += print(1, "<script src='https://cdn.datatables.net/1.10.16/js/dataTables.semanticui.min.js'></script>")
+		}
+
+		imports += openTag(1, "script")
+		imports += print(2, "\$(document).ready(function() {")
+		imports += print(3, "\$('#${c.name.toLowerCase()}-form').DataTable({")
+		imports += print(4, "responsive: true")
+		imports += print(3, "})")
+
+		if(jsAction != "")
+			imports += jsAction
+
+		imports += print(2, "})")
+		imports += closeTag(1, "script")
+		return imports
+	}
+
+	def buildSectionHeader(String title) {
+		String section = ""
+
+		if(framework == SEMANTIC_UI) {
+			section += inlineTag(1, "h5", title.capitalize(), "class='ui top attached header'")
+			section += openTag(1, "div", "class='ui segment padded attached clearing'")
+		} else if(framework == BOOTSTRAP) {
+			section += openTag(1, "div", "class='card mb-2'")
+			section += openTag(1, "ul", "class='list-group list-group-flush'")
+			section += openTag(1, "li", "class='list-group-item'")
+			section += inlineTag(2, "h5", title.capitalize())
+			section += closeTag(1, "li")
+			section += openTag(1, "li", "class='list-group-item'")
+		}
+
+		return section
+	}
+
+	def buildSectionHeaderEnd() {
+		String end = ""
+
+		if(framework == SEMANTIC_UI) {
+			end += closeTag(1, "div")
+		} else if(framework == BOOTSTRAP) {
+			end += closeTag(1, "li")
+			end += closeTag(1, "div")
+		}
+
+		return end
+	}
+
+	def buildLinkStylesheet(int indentation, String url) {
+		return print(indentation, "<link rel='stylesheet' href='${url}' />")
+	}
+
+	def buildLinkStylesheet(String url) {
+		return buildLinkStylesheet(0, url)
+	}
+
+	def inlineTag(int indentation, String tag, String content, String props) {
+		String open = openTag(0, tag, props)
+		String result = open.substring(0, open.length() - 1) + content + closeTag(tag)
+		return print(indentation, result)
+	}
+
+	def inlineTag(int indentation, String tag, String content) {
+		return inlineTag(indentation, tag, content, "")
+	}
+
+	def closeTag(int indentation, String tag) {
+		return openTag(indentation, "/${tag}")
+	}
+
+	def closeTag(String tag) {
+		return closeTag(0, tag)
+	}
+
+	def openTag(int indentation, String tag, String props) {
+		if(props != "")
+			props = " ${props}"
+		return print(indentation, "<${tag}${props}>")
+	}
+
+	def openTag(int indentation, String tag) {
+		return openTag(indentation, tag, "")
+	}
+
+	def openTag(String tag) {
+		return openTag(0, tag)
+	}
+
+	def print(String text) {
+		return print(0, text)
+	}
+
+	def print(int indentation, String text) {
+		String res = ""
+
+		while(indentation > 0) {
+			res += "\t"
+			indentation--
+		}
+
+		if(text.substring(text.length() - 1) == "\n")
+			return res + text
+
+		return res + text + "\n"
+	}
+
+}

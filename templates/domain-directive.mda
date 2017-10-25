@@ -203,7 +203,7 @@ class Domain {
 
 		String result = ""
 
-		if(isClass()) 
+		if(isClass(c)) 
 			result += "\t// Methods\n"
 		else 
 			result = "\t// Method Signatures\n"
@@ -219,7 +219,7 @@ class Domain {
 				result = result.substring(0, result.length() - 2)
 
 			// Close method scope if class
-			if(isClass()) {
+			if(isClass(c)) {
 				result += ") {\n"
 				result += "\t\t\n"
 				result += "\t}\n\n"
