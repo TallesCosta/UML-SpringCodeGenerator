@@ -1,0 +1,253 @@
+import java.util.*
+import in.labulle.anycode.uml.*
+import in.labulle.anycode.engine.groovy.directive.*
+
+class Domain {
+	JavaDirective java = new JavaDirective()
+	IClassifier c;
+	List<IAttribute> attributes;
+	List<IAttribute> attributesList;
+
+	def setup(IClassifier c) {
+		this.c = c;
+		this.attributes = new ArrayList<IAttribute>()
+		this.attributesList = new ArrayList<IAttribute>()
+
+		c.attributes.each {
+
+			// Attribute isn't a relation? OR
+			// Attribute is relation and owning side?
+			if (!it.isRelation() || !it.name.isEmpty()
+				&& it.isOneToOne()) {
+				// Primitive and simple association attributes
+				attributes.push(it)
+			// Attribute is a relation? AND
+			// Attribute is relation One-To-Many?
+			} else if (it.isRelation() && it.isOneToMany()) {
+				// multiple association attributes (List)
+				attributesList.push(it)
+			}
+		}
+	}
+
+	def type() {
+		if(isInterface(c))
+			return "interface"
+		else if(isClass(c))
+			return "class"
+		return "quedrogaehessa"
+	}
+
+	def name(IClassifier c) {
+		if(isInterface(c))
+			return "I${c.name}"
+		else if(isClass(c))
+			return "${c.name}"
+	}
+
+	def name() {
+		if(isInterface(c))
+			return "I${c.name}"
+		else if(isClass(c))
+			return "${c.name}"
+	}
+
+	def isClass(IClassifier classifier) {
+		return classifier instanceof IClass
+	}
+
+	def isInterface(IClassifier classifier) {
+		return classifier instanceof IInterface
+	}
+
+	def imports() {
+		String result = "";
+
+		if (!attributesList.isEmpty())
+			result += "import java.util.List;";
+
+		return result.equals("") ? "" : "\n${result}\n" ;
+	}
+
+	def qualifier() {
+		String result = ""
+
+		result += c.visibility.toString().toLowerCase()
+		
+		if (c.hasStereotype("abstract"))
+			result += " abstract"
+		if (c.hasStereotype("final"))
+			result += " final"
+
+		return result
+	}
+
+	def inheritages() {
+		String result = ""
+
+		if(!c.generalizations.isEmpty()) {
+			result += " extends"
+			c.generalizations.each {
+				result += " " + it.name + ","
+			}
+
+			result = result.substring(0, result.length() - 1)
+		}
+
+		if (c instanceof IClass) {
+			if(!c.realizations.isEmpty()) {
+				result += " implements"
+				c.realizations.each {
+					result += " " + it.name + ","
+				}
+
+				result = result.substring(0, result.length() - 1)
+			}
+		}
+
+		return result
+	}
+
+	def attributes() {
+		if(attributes.isEmpty() && attributesList.isEmpty())
+			return ""
+
+		String result = "\t// Attributes\n"
+
+		attributes.each {
+			result += "\t${it.visibility.toString().toLowerCase()} ${it.dataType.name} ${it.name};\n"
+		}
+
+		attributesList.each {
+			result += "\t${it.visibility.toString().toLowerCase()} List<${it.dataType.name}> ${it.name};\n"
+		}
+
+		return "${result}\n"
+	}
+
+	def constructors() {
+		if(attributes.isEmpty() && attributesList.isEmpty())
+			return ""
+
+		String result = "\t// Constructors\n"
+
+		result += "${emptyConstructor()}"
+		result += "${fullConstructor()}"
+
+		return "${result}\n"
+	}
+
+	def emptyConstructor() {
+		return "\tpublic ${c.name}() { }\n\n"
+	}
+
+	def fullConstructor() {
+		String result = "\tpublic ${c.name}("
+
+		attributes.each {
+			result += "${it.dataType.name} ${it.name}, "
+		}
+
+		attributesList.each {
+			result += "List<${it.dataType.name}> ${it.name}, "
+		}
+
+		result = result.substring(0, result.length() - 2) + ") {\n"
+
+		attributes.plus(attributesList).each {
+			result += "\t\tthis.${it.name} = ${it.name};\n"
+		}
+
+		result += "\t}\n"
+
+		return result
+	}
+
+	def gets() {
+		if(attributes.isEmpty() && attributesList.isEmpty())
+			return ""
+
+		String result = "\t// Getters\n"
+
+		attributes.each {
+			result += "\tpublic ${it.dataType.name} get${it.name.capitalize()}() {\n\t\treturn ${it.name};\n\t}\n\n"
+		}
+
+		attributesList.each {
+			result += "\tpublic List<${it.dataType.name}> get${it.name.capitalize()}() {\n\t\treturn ${it.name};\n\t}\n\n"
+		}
+
+		return result
+	}
+
+	def sets() {
+		if(attributes.isEmpty() && attributesList.isEmpty())
+			return ""
+
+		String result = "\t// Setters\n"
+
+		attributes.each {
+			result += "\tpublic void set${it.name.capitalize()}(${it.dataType.name} ${it.name}) {\n\t\tthis.${it.name} = ${it.name};\n\t}\n\n"
+		}
+
+		attributesList.each {
+			result += "\tpublic void set${it.name.capitalize()}(List<${it.dataType.name}> ${it.name}) {\n\t\tthis.${it.name} = ${it.name};\n\t}\n\n"
+		}
+
+		return result
+	}
+
+	def methods() {
+		if(c.operations.isEmpty())
+			return ""
+
+		String result = ""
+
+		if(isClass(c)) 
+			result += "\t// Methods\n"
+		else 
+			result = "\t// Method Signatures\n"
+
+		c.operations.each {
+			result += "\t${it.visibility.toString().toLowerCase()} ${it.returnType.name} ${it.name}("
+
+			it.parameters.each {
+				result += "${it.dataType.name} ${it.name}, "
+			}
+
+			if (!it.parameters.isEmpty())
+				result = result.substring(0, result.length() - 2)
+
+			// Close method scope if class
+			if(isClass(c)) {
+				result += ") {\n"
+				result += "\t\t\n"
+				result += "\t}\n\n"
+			}
+			// Close method signature if interface
+			else result += ");\n\n"
+		}
+
+		return result
+	}
+
+}
+
+/*result += "\tDoc: " + it.documentation + "\n"
+result += "\tModifier: " + it.modifier + "\n"
+result += "\tName: " + it.name + "\n"
+result += "\tOwner: " + it.owner.name + "\n"
+if (it instanceof IRelationAttribute) {
+	result += "\tOther Side: " + it.otherSide.name + "\n"
+
+	if (it.isOneToMany()) {
+		result += "\tRelation: One-To-Many\n\n"
+	} else if (it.isOneToOne()) {
+		result += "\tRelation: One-To-One\n\n"
+	} else if (it.isManyToOne()) {
+		result += "\tRelation: Many-To-One\n\n"
+	} else if (it.isManyToMany()) {
+		result += "\tRelation: Many-To-Many\n\n"
+	}
+}
+result += "\tIs Relation? " + it.isRelation() + "\n"*/

@@ -1,0 +1,16 @@
+import java.util.*
+import in.labulle.anycode.uml.*
+import in.labulle.anycode.engine.groovy.directive.*
+
+class Repository {
+	IClass c;
+
+	def setup(IClass c) {
+		this.c = c;
+	}
+
+	def imports() {
+		return "\nimport org.springframework.data.jpa.repository.JpaRepository;\n"
+	}
+
+}
