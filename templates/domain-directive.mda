@@ -33,9 +33,8 @@ class Domain {
 	def type() {
 		if(isInterface(c))
 			return "interface"
-		else if(isClass(c))
+		else(isClass(c))
 			return "class"
-		return "quedrogaehessa"
 	}
 
 	def name(IClassifier c) {
@@ -225,6 +224,38 @@ class Domain {
 
 		attributesList.each {
 			result += "\tpublic void set${it.name.capitalize()}(List<${it.dataType.name}> ${it.name}) {\n\t\tthis.${it.name} = ${it.name};\n\t}\n\n"
+		}
+
+		return result
+	}
+
+	def addAccessMethods() {
+		if(attributesList.isEmpty())
+			return ""
+
+		String result = ""
+
+		attributesList.each {
+			result += "\t// Additional access methods - ${it.name}\n"
+			result += "\tpublic int count${it.name.capitalize()}() {\n"
+			result += "\t\treturn this.${it.name}.size();\n"
+			result += "\t}\n\n"
+
+			result += "\tpublic ${it.dataType.name} get${it.name.capitalize()}(int index) {\n"
+			result += "\t\treturn this.${it.name}.get(index);\n"
+			result += "\t}\n\n"
+
+			result += "\tpublic void add${it.name.capitalize()}(${it.dataType.name} ${it.name}) {\n"
+			result += "\t\treturn this.${it.name}.add(${it.name});\n"
+			result += "\t}\n\n"
+
+			result += "\tpublic void remove${it.name.capitalize()}(int index) {\n"
+			result += "\t\treturn this.${it.name}.remove(index);\n"
+			result += "\t}\n\n"
+
+			result += "\tpublic void remove${it.name.capitalize()}(${it.dataType.name} ${it.name}) {\n"
+			result += "\t\treturn this.${it.name}.remove(${it.name});\n"
+			result += "\t}\n\n"
 		}
 
 		return result
