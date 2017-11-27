@@ -132,13 +132,46 @@ class Domain {
 		String result = "\t// Constructors\n"
 
 		result += "${emptyConstructor()}"
+		result += "${halfConstructor()}"
 		result += "${fullConstructor()}"
 
 		return "${result}\n"
 	}
 
 	def emptyConstructor() {
-		return "\tpublic ${c.name}() { }\n\n"
+		String result = ""
+		
+		result += "\tpublic ${c.name}() {"
+
+		attributesList.each {
+			result += "\n\t\tthis.${it.name} = ArrayList<>();"
+		}
+
+		result += "\n\t}\n\n"
+
+		return result
+	}
+
+	def halfConstructor() {
+		String result = "\tpublic ${c.name}("
+
+		attributes.each {
+			result += "${it.dataType.name} ${it.name}, "
+		}
+
+		result = result.substring(0, result.length() - 2) + ") {\n"
+
+		attributes.each {
+			result += "\t\tthis.${it.name} = ${it.name};\n"
+		}
+
+		attributesList.each {
+			result += "\t\tthis.${it.name} = ArrayList<>();\n"
+		}
+
+		result += "\t}\n\n"
+
+		return result
 	}
 
 	def fullConstructor() {
