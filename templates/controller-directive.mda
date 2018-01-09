@@ -23,7 +23,7 @@ class Controller {
 		String result = ""
 
 		result += "\nimport org.springframework.stereotype.Controller;\n"
-		result += "\nimport ${c.owner.getFullyQualifiedName(".")}.repository.${c.name}Repository;\n"
+		result += "\nimport ${c.owner.getFullyQualifiedName(".")}.dao.${c.name}Repository;\n"
 
 		return result
 	}
@@ -33,9 +33,9 @@ class Controller {
 		String resource = c.name.substring(0, 1).toLowerCase() + c.name.substring(1, c.name.length());
 
 		// Display form to create/update resource
-		result += "\t@RequestMapping(path = {\"/new\", \"/edit\"}, method = RequestMethod.GET)\n"
-		result += "\tpublic ModelAndView form(${c.name} ${resource}, RedirectAttributes redirectAttributes) {\n"
-		result += "\t\tModelAndView mv = new ModelAndView(\"${c.name.substring(0, 1).toLowerCase()}${c.name.substring(1, c.name.length())}/list\");\n"
+		result += "\t@RequestMapping(path = \"/save\", method = RequestMethod.POST)\n"
+		result += "\tpublic ${c.name} save(${c.name} ${resource}, RedirectAttributes redirectAttributes) {\n"
+		result += "\t\t${c.name} ${resource} = new ${c.name});\n"
 		result += "\t\tmv.addObject(\"${resource}\", ${resource});\n"
 		result += "\t\t\n"
 		result += "\t\tif (redirectAttributes.getFlashAttributes().get(\"message\") != null) {\n"

@@ -47,7 +47,7 @@ class Service {
 		result += "\t\treturn ${c.name.toLowerCase()}Repository.save(${c.name.toLowerCase()});\n"
 		result += "\t}\n\n"
 
-		result += "\tpublic void deletar(long id) {\n"
+		result += "\tpublic boolean deletar(long id) {\n"
 		result += "\t\t${c.name.toLowerCase()}Repository.delete(id);\n"
 		result += "\t\treturn true;\n"
 		result += "\t}\n\n"
@@ -59,6 +59,10 @@ class Service {
 
 		result += "\tpublic ${c.name} porId(long id) {\n"
 		result += "\t\treturn ${c.name.toLowerCase()}Repository.findOne(id);\n"
+		result += "\t}\n\n"
+
+		result += "\tpublic Set<${c.name}> todos() {\n"
+		result += "\t\treturn ${c.name.toLowerCase()}Repository.findAll();\n"
 		result += "\t}\n"
 
 		return result
