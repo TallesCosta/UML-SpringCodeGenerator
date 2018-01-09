@@ -40,8 +40,9 @@ class Controller {
 
 	def imports() {
 		String result = ""
-		
+
 		result += "import org.springframework.web.bind.annotation.RequestMapping;\n"
+		result += "import org.springframework.web.bind.annotation.RequestMethod;\n"
 		result += "import org.springframework.web.bind.annotation.RestController;\n"
 
 		result += "\nimport ${c.owner.getFullyQualifiedName(".")}.dominio.${c.name};\n"
@@ -55,22 +56,27 @@ class Controller {
 		String result = ""
 		String resource = c.name.substring(0, 1).toLowerCase() + c.name.substring(1, c.name.length());
 
+		result += "\t@RequestMapping(method = RequestMethod.POST)\n"
 		result += "\tpublic ${c.name} salvar(${c.name} ${c.name.toLowerCase()}) {\n"
 		result += "\t\treturn ${service}.salvar(${c.name.toLowerCase()});\n"
 		result += "\t}\n\n"
 
+		result += "\t@RequestMapping(method = RequestMethod.DELETE)\n"
 		result += "\tpublic boolean deletar(long id) {\n"
 		result += "\t\treturn ${service}.deletar(id);\n"
 		result += "\t}\n\n"
 
+		result += "\t@RequestMapping(method = RequestMethod.PATCH)\n"
 		result += "\tpublic boolean editar(${c.name} ${c.name.toLowerCase()}) {\n"
 		result += "\t\treturn ${service}.editar(${c.name.toLowerCase()});\n"
 		result += "\t}\n\n"
 
+		result += "\t@RequestMapping(path="/:id", method = RequestMethod.GET)\n"
 		result += "\tpublic ${c.name} porId(long id) {\n"
 		result += "\t\treturn ${service}.porId(id);\n"
 		result += "\t}\n\n"
 
+		result += "\t@RequestMapping(method = RequestMethod.GET)\n"
 		result += "\tpublic Iterable<${c.name}> todos() {\n"
 		result += "\t\treturn ${service}.todos();\n"
 		result += "\t}\n"
