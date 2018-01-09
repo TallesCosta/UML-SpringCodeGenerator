@@ -38,7 +38,7 @@ class Controller {
 		result += "\t\tModelAndView mv = new ModelAndView(\"${c.name.substring(0, 1).toLowerCase()}${c.name.substring(1, c.name.length())}/list\");\n"
 		result += "\t\tmv.addObject(\"${resource}\", ${resource});\n"
 		result += "\t\t\n"
-		result += "\t\tif (redirectAttributes.getFlashAttributes().get(\"message\") != null)\n"
+		result += "\t\tif (redirectAttributes.getFlashAttributes().get(\"message\") != null) {\n"
 		result += "\t\t\tmv.addObject(\"message\", redirectAttributes.getFlashAttributes().get(\"message\"));\n"
 		result += "\t\t\tmv.addObject(\"alertClass\", redirectAttributes.getFlashAttributes().get(\"alertClass\"));\n"
 		result += "\t\t}\n"
