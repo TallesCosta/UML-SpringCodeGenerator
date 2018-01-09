@@ -12,7 +12,7 @@ class Repository {
 	def imports() {
 		String imports = ""
 
-		result += "\nimport ${c.owner.getFullyQualifiedName(".")}.dominio.${c.name};\n"
+		imports += "\nimport ${c.owner.getFullyQualifiedName(".")}.dominio.${c.name};\n"
 		imports += "\nimport org.springframework.data.repository.CrudRepository;\n"
 
 		return imports
