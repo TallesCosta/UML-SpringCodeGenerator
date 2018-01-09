@@ -10,7 +10,12 @@ class Service {
 	}
 
 	def attributes() {
-		return "\tprivate final ${c.name}Repository ${c.name.toLowerCase()}Repository;"
+		String result = ""
+
+		result += "\t@Autowired"
+		result += "\tprivate ${c.name}Repository ${c.name.toLowerCase()}Repository;"
+
+		return result
 	}
 
 	def constructor() {
@@ -26,6 +31,7 @@ class Service {
 	def imports() {
 		String result = ""
 
+		result += "\nimport org.springframework.beans.factory.annotation.Autowired;\n"
 		result += "\nimport org.springframework.stereotype.Service;\n"
 		result += "\nimport ${c.owner.getFullyQualifiedName(".")}.repository.${c.name}Repository;\n"
 
@@ -35,12 +41,20 @@ class Service {
 	def methods() {
 		String result = ""
 
-		result += "\tpublic ${c.name} save(${c.name} ${c.name.toLowerCase()}) {\n"
+		result += "\tpublic ${c.name} salvar(${c.name} ${c.name.toLowerCase()}) {\n"
 		result += "\t\treturn ${c.name.toLowerCase()}Repository.saveAndFlush(${c.name.toLowerCase()});\n"
 		result += "\t}\n\n"
 
-		result += "\tpublic boolean delete(long id) {\n"
+		result += "\tpublic void deletar(long id) {\n"
 		result += "\t\treturn ${c.name.toLowerCase()}Repository.delete(id);\n"
+		result += "\t}\n\n"
+
+		result += "\tpublic void editar(${c.name} ${c.name.toLowerCase()}) {\n"
+		result += "\t\treturn ${c.name.toLowerCase()}Repository.save(${c.name.toLowerCase()});\n"
+		result += "\t}\n\n"
+
+		result += "\tpublic ${c.name} porId(long id}) {\n"
+		result += "\t\treturn ${c.name.toLowerCase()}Repository.findOne(id);\n"
 		result += "\t}\n"
 
 		return result
