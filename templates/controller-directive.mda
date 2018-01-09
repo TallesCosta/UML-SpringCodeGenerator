@@ -22,7 +22,7 @@ class Controller {
 	def attributes() {
 		String result = ""
 		
-		result += "\t${c.name}Service ${c.name.toLowerCase()}Service;\n"
+		result += "\tprivate ${c.name}Service ${c.name.toLowerCase()}Service;\n"
 		
 		return result
 	}
@@ -71,7 +71,7 @@ class Controller {
 		result += "\t\treturn ${service}.editar(${c.name.toLowerCase()});\n"
 		result += "\t}\n\n"
 
-		result += "\t@RequestMapping(path="/:id", method = RequestMethod.GET)\n"
+		result += "\t@RequestMapping(path = \"/{id}\", method = RequestMethod.GET)\n"
 		result += "\tpublic ${c.name} porId(long id) {\n"
 		result += "\t\treturn ${service}.porId(id);\n"
 		result += "\t}\n\n"

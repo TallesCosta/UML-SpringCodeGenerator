@@ -21,8 +21,7 @@ class Service {
 	def constructor() {
 		String result = ""
 		
-		result += "\tpublic ${c.name}Service(${c.name}Repository ${c.name.toLowerCase()}Repository) {\n"
-		result += "\t\tthis.${c.name.toLowerCase()}Repository = ${c.name.toLowerCase()}Repository;\n"
+		result += "\tpublic ${c.name}Service($) {\n"
 		result += "\t}"
 		
 		return result
