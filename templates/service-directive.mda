@@ -53,7 +53,7 @@ class Service {
 		result += "\t\treturn ${c.name.toLowerCase()}Repository.save(${c.name.toLowerCase()});\n"
 		result += "\t}\n\n"
 
-		result += "\tpublic ${c.name} porId(long id}) {\n"
+		result += "\tpublic ${c.name} porId(long id) {\n"
 		result += "\t\treturn ${c.name.toLowerCase()}Repository.findOne(id);\n"
 		result += "\t}\n"
 
