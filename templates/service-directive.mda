@@ -37,6 +37,8 @@ class Service {
 		result += "\nimport ${c.owner.getFullyQualifiedName(".")}.dao.${c.name}Repository;\n"
 		result += "import ${c.owner.getFullyQualifiedName(".")}.dominio.${c.name};\n"
 
+		result += "\nimport java.util.Set;\n"
+		
 		return result
 	}
 
