@@ -40,11 +40,7 @@ class Controller {
 
 	def imports() {
 		String result = ""
-
-		result += "\nimport org.springframework.stereotype.Controller;\n"
-
-		result += "\nimport org.springframework.beans.factory.annotation.Autowired;\n"
-		result += "import org.springframework.stereotype.Service;\n"
+		
 		result += "import org.springframework.web.bind.annotation.RequestMapping;\n"
 		result += "import org.springframework.web.bind.annotation.RestController;\n"
 
