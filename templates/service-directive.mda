@@ -21,7 +21,7 @@ class Service {
 	def constructor() {
 		String result = ""
 		
-		result += "\tpublic ${c.name}Service($) {\n"
+		result += "\tpublic ${c.name}Service() {\n"
 		result += "\t}"
 		
 		return result
