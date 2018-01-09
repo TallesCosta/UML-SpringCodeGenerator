@@ -51,8 +51,6 @@ class Controller {
 		result += "\nimport ${c.owner.getFullyQualifiedName(".")}.dominio.${c.name};\n"
 		result += "import ${c.owner.getFullyQualifiedName(".")}.servico.${c.name}Service;\n"
 
-		result += "\nimport java.util.Set;\n"
-
 		return result
 	}
 
@@ -77,7 +75,7 @@ class Controller {
 		result += "\t\treturn ${service}.porId(id);\n"
 		result += "\t}\n\n"
 
-		result += "\tpublic Set<${c.name}> todos() {\n"
+		result += "\tpublic Iterable<${c.name}> todos() {\n"
 		result += "\t\treturn ${service}.todos();\n"
 		result += "\t}\n"
 
