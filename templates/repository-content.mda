@@ -1,7 +1,7 @@
 <%  if(c.hasStereotype("entity") && !c.hasStereotype("abstract")) { %>
 package ${c.owner.getFullyQualifiedName(".")}.dao;
 <% repository.setup(c) %>${repository.imports()}
-public interface ${c.name}Repository extends CrudRepository<${c.name}, Long> {
+public interface ${c.name}Repository extends JpaRepository<${c.name}, Long> {
 
 }
 <% } %>

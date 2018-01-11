@@ -56,11 +56,11 @@ class Service {
 		result += "\t\treturn true;\n"
 		result += "\t}\n\n"
 
-		result += "\tpublic ${c.name} porId(long id) {\n"
+		result += "\tpublic ${c.name} mostrar(long id) {\n"
 		result += "\t\treturn ${c.name.toLowerCase()}Repository.findOne(id);\n"
 		result += "\t}\n\n"
 
-		result += "\tpublic Iterable<${c.name}> todos() {\n"
+		result += "\tpublic Iterable<${c.name}> listar() {\n"
 		result += "\t\treturn ${c.name.toLowerCase()}Repository.findAll();\n"
 		result += "\t}\n"
 
