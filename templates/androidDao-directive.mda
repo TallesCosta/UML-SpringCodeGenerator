@@ -1,0 +1,86 @@
+import java.util.*
+import in.labulle.anycode.uml.*
+import in.labulle.anycode.engine.groovy.directive.*
+
+class AndroidDao {
+	IClass c;
+	String plural = ""
+
+	def setup(IClass c) {
+		this.c = c;
+	}
+
+	def imports() {
+		String result = ""
+		
+		result += "\n"
+		result += "import android.arch.persistence.room.Dao\n"
+		result += "import android.arch.persistence.room.Query\n"
+		result += "import android.arch.persistence.room.Insert\n"
+		result += "import android.arch.persistence.room.Delete\n"
+		result += "import android.arch.persistence.room.Update\n\n"
+		
+		result += "import java.util.Set\n"
+
+		return result
+	}
+
+	def createMethods() {
+		String result = ""
+		String lower = c.name.toLowerCase()
+
+		result += "\t@Insert\n\t"
+		result += buildMethod("adicionar", "", ["${c.name}"], ["vararg ${resolvePlural()}"])
+		result += "\n\n"
+
+		result += "\t@Delete\n\t"
+		result += buildMethod("excluir", "", [c.name], [lower])
+		result += "\n\n"
+
+		result += "\t@Update\n\t"
+		result += buildMethod("alterar", "Set<${c.name}>", [], [])
+		result += "\n\n"
+
+		result += "\t@Query(\"SELECT * FROM ${lower}\")\n\t"
+		result += buildMethod("todos", "Set<${c.name}>", [], [])
+		result += "\n\n"
+
+		result += "\t@Query(\"SELECT FROM ${lower} WHERE id = :id\")\n\t"
+		result += buildMethod("porId", c.name, ["Int"], ["id"])
+
+		return result
+	}
+
+	def buildMethod(String name, String returnType, ArrayList<String> parameterTypes, ArrayList<String> parameterNames) {
+		String result = ""
+		String params = ""
+
+		parameterTypes.eachWithIndex { it, i ->
+			String pre = i != 0? ", " : ""
+			params += "${pre}${parameterNames[i]}: ${it}"
+		}
+
+		returnType = returnType != "" ? ": ${returnType}" : ""
+
+		result += "fun ${name}(${params})${returnType}"
+
+		return result
+	}
+
+	def resolvePlural() {
+		if(plural != "")
+			return plural
+
+		if(c.name.endsWith("y"))
+			plural = c.name.toLowerCase().substring(0, c.name.size() - 1) + "ies"
+		else if(c.name.endsWith("m"))
+			plural = c.name.toLowerCase().substring(0, c.name.size() - 1) + "ns"
+		else if(c.name.endsWith("s"))
+			plural = c.name.toLowerCase()
+		else
+			plural = c.name.toLowerCase() + "s"
+
+		return plural
+	}
+
+}

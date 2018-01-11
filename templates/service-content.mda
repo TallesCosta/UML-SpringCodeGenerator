@@ -1,5 +1,5 @@
 <%  if(c.hasStereotype("entity") && !c.hasStereotype("abstract")) { %>
-package ${c.owner.getFullyQualifiedName(".")}.service;
+package ${c.owner.getFullyQualifiedName(".")}.servico;
 <% service.setup(c) %>${service.imports()}
 @Service
 public class ${c.name}Service {

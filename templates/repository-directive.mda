@@ -10,7 +10,12 @@ class Repository {
 	}
 
 	def imports() {
-		return "\nimport org.springframework.data.jpa.repository.JpaRepository;\n"
+		String imports = ""
+
+		imports += "\nimport ${c.owner.getFullyQualifiedName(".")}.dominio.${c.name};\n"
+		imports += "\nimport org.springframework.data.repository.JpaRepository;\n"
+
+		return imports
 	}
 
 }

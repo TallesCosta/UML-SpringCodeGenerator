@@ -1,0 +1,61 @@
+import java.util.*
+import in.labulle.anycode.uml.*
+import in.labulle.anycode.engine.groovy.directive.*
+
+class AndroidEntity {
+	IClass c;
+	List<IAttribute> attributes;
+	List<IAttribute> attributesList;
+
+	def setup(IClass c) {
+		this.c = c;
+		this.attributes = new ArrayList<IAttribute>()
+		this.attributesList = new ArrayList<IAttribute>()
+
+		c.attributes.each {
+			if (!it.isRelation() || !it.name.isEmpty()
+				&& it.isOneToOne()) {
+				attributes.push(it)
+			} else if (it.isRelation() && it.isOneToMany()) {
+				attributesList.push(it)
+			}
+		}
+	}
+
+	def imports() {
+		String result = "";
+
+		result += "import android.arch.persistence.room.Entity\n";
+		result += "import android.arch.persistence.room.PrimaryKey\n";
+
+		if (!attributesList.isEmpty() || !attributes.isEmpty()) {
+			result += "import android.arch.persistence.room.ColumnInfo\n";
+		}
+
+		return "\n${result}";
+	}
+
+	def buildPrimaryConstructor() {
+		if(attributes.isEmpty() && attributesList.isEmpty())
+			return ""
+
+		String result = ""
+
+		result += "@PrimaryKey val id: Long, "
+
+		attributes.each {
+			result += "${annotationFor(it.name)} val ${it.name}: ${it.dataType.name}, "
+		}
+
+		attributesList.each {
+			result += "${annotationFor(it.name)} val ${it.name}: ${it.dataType.name}, "
+		}
+
+		return "${result[0..-3]}"
+	}
+
+	def annotationFor(String name) {
+		return "@ColumnInfo(name = \"${name}\")"
+	}
+
+}
