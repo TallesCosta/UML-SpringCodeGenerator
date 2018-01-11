@@ -39,8 +39,8 @@ class Service {
 		result += "\t\treturn ${c.name.toLowerCase()}Repository.saveAndFlush(${c.name.toLowerCase()});\n"
 		result += "\t}\n\n"
 
-		result += "\tpublic boolean delete(long id) {\n"
-		result += "\t\treturn ${c.name.toLowerCase()}Repository.delete(id);\n"
+		result += "\tpublic void delete(long id) {\n"
+		result += "\t\t${c.name.toLowerCase()}Repository.delete(id);\n"
 		result += "\t}\n"
 
 		return result
