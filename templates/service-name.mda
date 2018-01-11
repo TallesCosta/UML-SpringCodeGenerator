@@ -1,1 +1,1 @@
-${targetDir}/${c.owner.getFullyQualifiedName("/")}/service/${c.name}Service.java
+${targetDir}/${c.owner.getFullyQualifiedName("/")}/servico/${c.name}Service.java

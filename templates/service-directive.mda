@@ -10,14 +10,18 @@ class Service {
 	}
 
 	def attributes() {
-		return "\tprivate final ${c.name}Repository ${c.name.toLowerCase()}Repository;"
+		String result = ""
+
+		result += "\n\t@Autowired\n"
+		result += "\tprivate ${c.name}Repository ${c.name.toLowerCase()}Repository;"
+
+		return result
 	}
 
 	def constructor() {
 		String result = ""
 		
-		result += "\tpublic ${c.name}Service(${c.name}Repository ${c.name.toLowerCase()}Repository) {\n"
-		result += "\t\tthis.${c.name.toLowerCase()}Repository = ${c.name.toLowerCase()}Repository;\n"
+		result += "\tpublic ${c.name}Service() {\n"
 		result += "\t}"
 		
 		return result
@@ -26,8 +30,11 @@ class Service {
 	def imports() {
 		String result = ""
 
-		result += "\nimport org.springframework.stereotype.Service;\n"
-		result += "\nimport ${c.owner.getFullyQualifiedName(".")}.repository.${c.name}Repository;\n"
+		result += "\nimport org.springframework.beans.factory.annotation.Autowired;\n"
+		result += "import org.springframework.stereotype.Service;\n"
+		
+		result += "\nimport ${c.owner.getFullyQualifiedName(".")}.dao.${c.name}Repository;\n"
+		result += "import ${c.owner.getFullyQualifiedName(".")}.dominio.${c.name};\n"
 
 		return result
 	}
@@ -35,12 +42,26 @@ class Service {
 	def methods() {
 		String result = ""
 
-		result += "\tpublic ${c.name} save(${c.name} ${c.name.toLowerCase()}) {\n"
-		result += "\t\treturn ${c.name.toLowerCase()}Repository.saveAndFlush(${c.name.toLowerCase()});\n"
+		result += "\tpublic ${c.name} salvar(${c.name} ${c.name.toLowerCase()}) {\n"
+		result += "\t\treturn ${c.name.toLowerCase()}Repository.save(${c.name.toLowerCase()});\n"
 		result += "\t}\n\n"
 
-		result += "\tpublic boolean delete(long id) {\n"
-		result += "\t\treturn ${c.name.toLowerCase()}Repository.delete(id);\n"
+		result += "\tpublic boolean deletar(long id) {\n"
+		result += "\t\t${c.name.toLowerCase()}Repository.delete(id);\n"
+		result += "\t\treturn true;\n"
+		result += "\t}\n\n"
+
+		result += "\tpublic boolean editar(${c.name} ${c.name.toLowerCase()}) {\n"
+		result += "\t\t${c.name.toLowerCase()}Repository.save(${c.name.toLowerCase()});\n"
+		result += "\t\treturn true;\n"
+		result += "\t}\n\n"
+
+		result += "\tpublic ${c.name} porId(long id) {\n"
+		result += "\t\treturn ${c.name.toLowerCase()}Repository.findOne(id);\n"
+		result += "\t}\n\n"
+
+		result += "\tpublic Iterable<${c.name}> todos() {\n"
+		result += "\t\treturn ${c.name.toLowerCase()}Repository.findAll();\n"
 		result += "\t}\n"
 
 		return result
