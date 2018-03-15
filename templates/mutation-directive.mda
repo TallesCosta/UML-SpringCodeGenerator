@@ -14,7 +14,7 @@ class Mutation {
 		String variable = c.name.substring(0, 1).toLowerCase() + c.name.substring(1)
 		
 		result += "\t@Autowired\n"
-		result += "\tprivate ${c.name}Repositorio ${variable}Repositorio;\n"
+		result += "\tprivate ${c.name}Servico ${variable}Servico;\n"
 		
 		return result
 	}
@@ -36,7 +36,7 @@ class Mutation {
 		result += "import org.springframework.beans.factory.annotation.Autowired;\n"
 		result += "import com.coxautodev.graphql.tools.GraphQLMutationResolver;\n"
 
-		result += "\nimport ${c.owner.getFullyQualifiedName(".")}.repositorio.${c.name}Repositorio;\n"
+		result += "\nimport ${c.owner.getFullyQualifiedName(".")}.servico.${c.name}Servico;\n"
 		result += "import ${c.owner.getFullyQualifiedName(".")}.dominio.${c.name};\n"
 
 		return result
@@ -47,19 +47,19 @@ class Mutation {
 		String variable = c.name.substring(0, 1).toLowerCase() + c.name.substring(1)
 
 		result += "\tpublic ${c.name} salvar${c.name}(${c.name} ${variable}) {\n"
-		result += "\t\treturn ${variable}Repositorio.salvar(${variable});\n"
+		result += "\t\treturn ${variable}Servico.salvar(${variable});\n"
 		result += "\t}\n\n"
 
 		result += "\tpublic ${c.name} editar${c.name}(${c.name} ${variable}) {\n"
-		result += "\t\treturn ${variable}Repositorio.editar(${variable});\n"
+		result += "\t\treturn ${variable}Servico.editar(${variable});\n"
 		result += "\t}\n\n"
 
 		result += "\tpublic ${c.name} excluir${c.name}(${c.name} ${variable}) {\n"
-		result += "\t\treturn ${variable}Repositorio.excluir(${variable}.getId());\n"
+		result += "\t\treturn ${variable}Servico.excluir(${variable}.getId());\n"
 		result += "\t}\n\n"
 
 		result += "\tpublic ${c.name} excluir${c.name}(Long id) {\n"
-		result += "\t\treturn ${variable}Repositorio.excluir(id);\n"
+		result += "\t\treturn ${variable}Servico.excluir(id);\n"
 		result += "\t}\n"
 
 		return result
