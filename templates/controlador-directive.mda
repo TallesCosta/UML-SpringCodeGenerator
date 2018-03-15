@@ -13,44 +13,75 @@ class Controlador {
 		String result = ""
 		
 		result += "\tpublic ${c.name}Controlador() {\n"
-		result += "\t\t\n"
+		result += "\t\t${c.name.toLowerCase()}Servico = new ${c.name}Servico();\n"
 		result += "\t}"
 		
 		return result
+	}
+
+	def attributes() {
+		String result = ""
+		
+		result += "\tprivate ${c.name}Servico ${c.name.toLowerCase()}Servico;\n"
+		
+		return result
+	}
+
+	def resolveControllerName() {
+		if(c.name.endsWith("y"))
+			return c.name.toLowerCase().substring(0, c.name.size() - 1) + "ies"
+		else if(c.name.endsWith("m"))
+			return c.name.toLowerCase().substring(0, c.name.size() - 1) + "ns"
+		else if(c.name.endsWith("s"))
+			return c.name.toLowerCase()
+		else
+			return c.name.toLowerCase() + "s"
 	}
 
 	def imports() {
 		String result = ""
 
 		result += "\nimport org.springframework.stereotype.Controller;\n"
-		result += "\nimport ${c.owner.getFullyQualifiedName(".")}.repositorio.${c.name}Repositorio;\n"
+
+		result += "import org.springframework.web.bind.annotation.RequestMapping;\n"
+		result += "import org.springframework.web.bind.annotation.RequestMethod;\n"
+		result += "import org.springframework.web.bind.annotation.RestController;\n"
+
+		result += "\nimport ${c.owner.getFullyQualifiedName(".")}.dominio.${c.name};\n"
+		result += "import ${c.owner.getFullyQualifiedName(".")}.servico.${c.name}Servico;\n"
 
 		return result
 	}
 
 	def methods() {
+		String service = "${c.name.toLowerCase()}Servico"
 		String result = ""
 		String resource = c.name.substring(0, 1).toLowerCase() + c.name.substring(1, c.name.length());
 
-		// Display form to create/update resource
-		result += "\t@RequestMapping(path = {\"/new\", \"/edit\"}, method = RequestMethod.GET)\n"
-		result += "\tpublic ModelAndView form(${c.name} ${resource}, RedirectAttributes redirectAttributes) {\n"
-		result += "\t\tModelAndView mv = new ModelAndView(\"${c.name.substring(0, 1).toLowerCase()}${c.name.substring(1, c.name.length())}/list\");\n"
-		result += "\t\tmv.addObject(\"${resource}\", ${resource});\n"
-		result += "\t\t\n"
-		result += "\t\tif (redirectAttributes.getFlashAttributes().get(\"message\") != null)\n"
-		result += "\t\t\tmv.addObject(\"message\", redirectAttributes.getFlashAttributes().get(\"message\"));\n"
-		result += "\t\t\tmv.addObject(\"alertClass\", redirectAttributes.getFlashAttributes().get(\"alertClass\"));\n"
-		result += "\t\t}\n"
-		result += "\t\t\n"
-		result += "\t\treturn mv;\n"
+		result += "\t@RequestMapping(method = RequestMethod.POST)\n"
+		result += "\tpublic ${c.name} salvar(${c.name} ${c.name.toLowerCase()}) {\n"
+		result += "\t\treturn ${service}.salvar(${c.name.toLowerCase()});\n"
 		result += "\t}\n\n"
 
-		// List resource
-		result += "\t@RequestMapping(method = RequestMethod.GET)\n"
-		result += "\tpublic ModelAndView list() {\n"
-		result += "\t\treturn new ModelAndView(\"${c.name.substring(0, 1).toLowerCase()}${c.name.substring(1, c.name.length())}/list\");\n"
+		result += "\t@RequestMapping(method = RequestMethod.DELETE)\n"
+		result += "\tpublic boolean deletar(long id) {\n"
+		result += "\t\treturn ${service}.deletar(id);\n"
 		result += "\t}\n\n"
+
+		result += "\t@RequestMapping(method = RequestMethod.PATCH)\n"
+		result += "\tpublic boolean editar(${c.name} ${c.name.toLowerCase()}) {\n"
+		result += "\t\treturn ${service}.editar(${c.name.toLowerCase()});\n"
+		result += "\t}\n\n"
+
+		result += "\t@RequestMapping(path = \"/{id}\", method = RequestMethod.GET)\n"
+		result += "\tpublic ${c.name} porId(long id) {\n"
+		result += "\t\treturn ${service}.porId(id);\n"
+		result += "\t}\n\n"
+
+		result += "\t@RequestMapping(method = RequestMethod.GET)\n"
+		result += "\tpublic Iterable<${c.name}> todos() {\n"
+		result += "\t\treturn ${service}.todos();\n"
+		result += "\t}\n"
 
 		return result
 	}

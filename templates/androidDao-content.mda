@@ -1,0 +1,8 @@
+<%  if(c.hasStereotype("entity")) { %>
+package ${c.owner.getFullyQualifiedName(".")};
+<% androidDao.setup(c) %>${androidDao.imports()}
+@Dao
+public interface ${c.name}Dao {
+${androidDao.createMethods()}
+}
+<% } %>

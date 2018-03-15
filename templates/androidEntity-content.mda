@@ -1,0 +1,6 @@
+<%  if(c.hasStereotype("entity")) { %>
+package ${c.owner.getFullyQualifiedName(".")};
+<% androidEntity.setup(c) %>${androidEntity.imports()}
+@Entity
+data class ${c.name}(${androidEntity.buildPrimaryConstructor()})
+<% } %>
