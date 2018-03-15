@@ -1,0 +1,68 @@
+import java.util.*
+import in.labulle.anycode.uml.*
+import in.labulle.anycode.engine.groovy.directive.*
+
+class Mutation {
+	IClass c;
+
+	def setup(IClass c) {
+		this.c = c;
+	}
+
+	def attributes() {
+		String result = ""
+		String variable = c.name.substring(0, 1).toLowerCase() + c.name.substring(1)
+		
+		result += "\t@Autowired\n"
+		result += "\tprivate ${c.name}Repositorio ${variable}Repositorio;\n"
+		
+		return result
+	}
+
+	def resolvePlural() {
+		if(c.name.endsWith("y"))
+			return c.name.toLowerCase().substring(0, c.name.size() - 1) + "ies"
+		else if(c.name.endsWith("m"))
+			return c.name.toLowerCase().substring(0, c.name.size() - 1) + "ns"
+		else if(c.name.endsWith("s"))
+			return c.name.toLowerCase()
+		else
+			return c.name.toLowerCase() + "s"
+	}
+
+	def imports() {
+		String result = ""
+
+		result += "import org.springframework.beans.factory.annotation.Autowired;\n"
+		result += "import com.coxautodev.graphql.tools.GraphQLMutationResolver;\n"
+
+		result += "\nimport ${c.owner.getFullyQualifiedName(".")}.repositorio.${c.name}Repositorio;\n"
+		result += "import ${c.owner.getFullyQualifiedName(".")}.dominio.${c.name};\n"
+
+		return result
+	}
+
+	def methods() {
+		String result = ""
+		String variable = c.name.substring(0, 1).toLowerCase() + c.name.substring(1)
+
+		result += "\tpublic ${c.name} salvar${c.name}(${c.name} ${variable}) {\n"
+		result += "\t\treturn ${variable}Repositorio.salvar(${variable});\n"
+		result += "\t}\n\n"
+
+		result += "\tpublic ${c.name} editar${c.name}(${c.name} ${variable}) {\n"
+		result += "\t\treturn ${variable}Repositorio.editar(${variable});\n"
+		result += "\t}\n\n"
+
+		result += "\tpublic ${c.name} excluir${c.name}(${c.name} ${variable}) {\n"
+		result += "\t\treturn ${variable}Repositorio.excluir(${variable}.getId());\n"
+		result += "\t}\n\n"
+
+		result += "\tpublic ${c.name} excluir${c.name}(Long id) {\n"
+		result += "\t\treturn ${variable}Repositorio.excluir(id);\n"
+		result += "\t}\n"
+
+		return result
+	}
+
+}

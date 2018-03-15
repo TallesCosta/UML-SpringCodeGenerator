@@ -1,0 +1,10 @@
+<%  if(c.hasStereotype("entity") && !c.hasStereotype("abstract")) { %>
+package ${c.owner.getFullyQualifiedName(".")}.resolver.mutation;
+
+<% mutation.setup(c) %>${mutation.imports()}
+public class ${c.name}Mutation implements GraphQLMutationResolver {
+
+${mutation.attributes()}
+${mutation.methods()}
+}
+<% } %>
