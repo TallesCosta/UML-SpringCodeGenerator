@@ -34,9 +34,7 @@ class Mutation {
 		String result = ""
 
 		result += "import org.springframework.beans.factory.annotation.Autowired;\n"
-		result += "import com.coxautodev.graphql.tools.GraphQLQueryResolver;\n"
-
-		result += "\nimport java.util.List;\n"
+		result += "import com.coxautodev.graphql.tools.GraphQLMutationResolver;\n"
 
 		result += "\nimport ${c.owner.getFullyQualifiedName(".")}.repositorio.${c.name}Repositorio;\n"
 		result += "import ${c.owner.getFullyQualifiedName(".")}.dominio.${c.name};\n"
