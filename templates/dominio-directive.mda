@@ -62,10 +62,18 @@ class Dominio {
 	def imports() {
 		String result = "";
 
-		if (!attributesList.isEmpty())
-			result += "import java.util.List;";
+		attributes.each {
+			if (it.dataType.name == "Date") {
+				result += "\nimport java.util.Date;";
+			}
+		}
 
-		return result.equals("") ? "" : "\n${result}\n" ;
+		if (!attributesList.isEmpty()) {
+			result += "\nimport java.util.List;";
+			result += "\nimport java.util.ArrayList;";
+		}
+
+		return result.equals("") ? "" : "${result}\n" ;
 	}
 
 	def qualifier() {
@@ -246,15 +254,15 @@ class Dominio {
 			result += "\t\treturn this.${it.name}.get(index);\n"
 			result += "\t}\n\n"
 
-			result += "\tpublic void add${it.name.capitalize()}(${it.dataType.name} ${it.name}) {\n"
-			result += "\t\treturn this.${it.name}.add(${it.name});\n"
+			result += "\tpublic boolean add${it.name.capitalize()}(${it.dataType.name} ${it.name}) {\n"
+			result += "\t\tthis.${it.name}.add(${it.name});\n"
 			result += "\t}\n\n"
 
-			result += "\tpublic void remove${it.name.capitalize()}(int index) {\n"
+			result += "\tpublic ${it.dataType.name} remove${it.name.capitalize()}(int index) {\n"
 			result += "\t\treturn this.${it.name}.remove(index);\n"
 			result += "\t}\n\n"
 
-			result += "\tpublic void remove${it.name.capitalize()}(${it.dataType.name} ${it.name}) {\n"
+			result += "\tpublic boolean remove${it.name.capitalize()}(${it.dataType.name} ${it.name}) {\n"
 			result += "\t\treturn this.${it.name}.remove(${it.name});\n"
 			result += "\t}\n\n"
 		}
