@@ -1,0 +1,10 @@
+<%  if(c.hasStereotype("entity") && !c.hasStereotype("abstract")) { %>
+package ${c.owner.getFullyQualifiedName(".")}.resolver.query;
+<% controller.setup(c) %>${controller.imports()}
+public class ${c.name}Query {
+
+${controller.attributes()}
+
+${controller.methods()}
+}
+<% } %>
