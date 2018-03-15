@@ -21,13 +21,17 @@ class Query {
 
 	def resolvePlural() {
 		if(c.name.endsWith("y"))
-			return c.name.toLowerCase().substring(0, c.name.size() - 1) + "ies"
+			return c.name.substring(0, 1).toLowerCase() + c.name.substring(1, c.name.size() - 1) + "ies"
 		else if(c.name.endsWith("m"))
-			return c.name.toLowerCase().substring(0, c.name.size() - 1) + "ns"
-		else if(c.name.endsWith("s"))
-			return c.name.toLowerCase()
+			return c.name.substring(0, 1).toLowerCase() + c.name.substring(1, c.name.size() - 1) + "ns"
+		else if(c.name.endsWith("l"))
+			return c.name.substring(0, 1).toLowerCase() + c.name.substring(1, c.name.size() - 1) + "eis"
+		else if(c.name.endsWith("r"))
+			return c.name.substring(0, 1).toLowerCase() + c.name.substring(1) + "es"
+		else if(c.name.endsWith("ao"))
+			return c.name.substring(0, 1).toLowerCase() + c.name.substring(1, c.name.size() - 2) + "oes"
 		else
-			return c.name.toLowerCase() + "s"
+			return c.name.substring(0, 1).toLowerCase() + c.name.substring(1) + "s"
 	}
 
 	def imports() {
@@ -46,14 +50,14 @@ class Query {
 
 	def methods() {
 		String result = ""
-		String variable = c.name.substring(0, 1).toLowerCase() + c.name.substring(1) + "Repositorio"
+		String variable = c.name.substring(0, 1).toLowerCase() + c.name.substring(1)
 
 		result += "\tpublic List<${c.name}> ${resolvePlural()}() {\n"
-		result += "\t\treturn ${variable}.listar();\n"
+		result += "\t\treturn ${variable}Servico.listar();\n"
 		result += "\t}\n\n"
 
-		result += "\tpublic List<${c.name}> ${c.name.toLowerCase()}(Long id) {\n"
-		result += "\t\treturn ${variable}.mostrar(id);\n"
+		result += "\tpublic ${c.name} ${variable}(Long id) {\n"
+		result += "\t\treturn ${variable}Servico.mostrar(id);\n"
 		result += "\t}\n"
 
 		return result
