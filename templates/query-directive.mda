@@ -11,9 +11,10 @@ class Query {
 
 	def attributes() {
 		String result = ""
+		String variable = c.name.substring(0, 1).toLowerCase() + c.name.substring(1)
 		
 		result += "\t@Autowired\n"
-		result += "\tprivate ${c.name}Repositorio ${c.name.toLowerCase()}Repositorio;\n"
+		result += "\tprivate ${c.name}Repositorio ${variable}Repositorio;\n"
 		
 		return result
 	}
@@ -45,14 +46,15 @@ class Query {
 
 	def methods() {
 		String result = ""
+		String variable = c.name.substring(0, 1).toLowerCase() + c.name.substring(1) + "Repositorio"
 
 		result += "\tpublic List<${c.name}> ${resolvePlural()}() {\n"
-		result += "\t\treturn ${c.name.toLowerCase()}Repositorio.listar();\n"
+		result += "\t\treturn ${variable}.listar();\n"
 		result += "\t}\n\n"
 
 		result += "\tpublic List<${c.name}> ${c.name.toLowerCase()}(Long id) {\n"
-		result += "\t\treturn ${c.name.toLowerCase()}Repositorio.mostrar(id);\n"
-		result += "\t}\n\n"
+		result += "\t\treturn ${variable}.mostrar(id);\n"
+		result += "\t}\n"
 
 		return result
 	}
