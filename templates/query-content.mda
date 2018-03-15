@@ -1,0 +1,10 @@
+<%  if(c.hasStereotype("entity") && !c.hasStereotype("abstract")) { %>
+package ${c.owner.getFullyQualifiedName(".")}.resolver.query;
+
+<% query.setup(c) %>${query.imports()}
+public class ${c.name}Query implements GraphQLQueryResolver {
+
+${query.attributes()}
+${query.methods()}
+}
+<% } %>
