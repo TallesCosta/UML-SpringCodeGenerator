@@ -2,7 +2,7 @@ import java.util.*
 import in.labulle.anycode.uml.*
 import in.labulle.anycode.engine.groovy.directive.*
 
-class Repository {
+class Repositorio {
 	IClass c;
 
 	def setup(IClass c) {

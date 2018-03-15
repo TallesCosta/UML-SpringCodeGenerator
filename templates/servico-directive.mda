@@ -1,0 +1,75 @@
+import java.util.*
+import in.labulle.anycode.uml.*
+import in.labulle.anycode.engine.groovy.directive.*
+
+class Servico {
+	IClass c;
+
+	def setup(IClass c) {
+		this.c = c;
+	}
+
+	def imports() {
+		String result = ""
+
+		result += "\nimport java.util.List;"
+
+		result += "\n\nimport org.springframework.stereotype.Service;"
+		result += "\nimport org.springframework.beans.factory.annotation.Autowired;"
+		result += "\nimport org.springframework.dao.EmptyResultDataAccessException;"
+
+		result += "\n\nimport ${c.owner.getFullyQualifiedName(".")}.dominio.${c.name};"
+		result += "\nimport ${c.owner.getFullyQualifiedName(".")}.repositorio.${c.name}Repositorio;\n"
+
+		return result
+	}
+
+	def attributes() {
+		String result = ""
+
+		result += "\n\t@Autowired\n"
+		result += "\tprivate ${c.name}Repositorio ${c.name.toLowerCase()}Repositorio;"
+
+		return result
+	}
+
+	def methods() {
+		String result = ""
+
+		result += "\t@Override\n"
+		result += "\tpublic ${c.name} mostrar(long id) {\n"
+		result += "\t\t${c.name} ${c.name.toLowerCase()} = ${c.name.toLowerCase()}Repositorio.findOne(id);\n"
+		result += "\n"
+		result += "\t\tif (null == ${c.name.toLowerCase()})\n"
+		result += "\t\t\tthrow new EmptyResultDataAccessException(1);\n"
+		result += "\n"
+		result += "\t\treturn ${c.name.toLowerCase()};\n"
+		result += "\t}\n\n"
+
+		result += "\t@Override\n"
+		result += "\tpublic List<${c.name}> listar() {\n"
+		result += "\t\treturn ${c.name.toLowerCase()}Repositorio.findAll();\n"
+		result += "\t}\n\n"
+
+		result += "\t@Override\n"
+		result += "\tpublic ${c.name} salvar(${c.name} ${c.name.toLowerCase()}) {\n"
+		result += "\t\treturn ${c.name.toLowerCase()}Repositorio.saveAndFlush(${c.name.toLowerCase()});\n"
+		result += "\t}\n\n"
+
+		result += "\t@Override\n"
+		result += "\tpublic ${c.name} editar(${c.name} ${c.name.toLowerCase()}) {\n"
+		result += "\t\tmostrar(${c.name.toLowerCase()}.getId());\n"
+		result += "\t\treturn ${c.name.toLowerCase()}Repositorio.saveAndFlush(${c.name.toLowerCase()});\n"
+		result += "\t}\n\n"
+
+		result += "\t@Override\n"
+		result += "\tpublic ${c.name} excluir(long id) {\n"
+		result += "\t\t${c.name} ${c.name.toLowerCase()} = mostrar(id);\n"
+		result += "\t\t${c.name.toLowerCase()}Repositorio.delete(id);\n"
+		result += "\t\treturn ${c.name.toLowerCase()};\n"
+		result += "\t}\n"
+
+		return result
+	}
+
+}

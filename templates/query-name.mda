@@ -1,0 +1,1 @@
+${targetDir}/${c.owner.getFullyQualifiedName("/")}/query/${c.name}Query.java

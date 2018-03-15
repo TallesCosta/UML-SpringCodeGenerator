@@ -1,0 +1,1 @@
+${targetDir}/${c.owner.getFullyQualifiedName("/")}/dominio/${dominio.name(c)}.java

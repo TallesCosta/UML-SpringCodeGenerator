@@ -1,1 +1,0 @@
-${targetDir}/${c.owner.getFullyQualifiedName("/")}/repositorio/${c.name}Repository.java

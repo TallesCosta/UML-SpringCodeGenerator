@@ -2,7 +2,7 @@ import java.util.*
 import in.labulle.anycode.uml.*
 import in.labulle.anycode.engine.groovy.directive.*
 
-class Controller {
+class Controlador {
 	IClass c;
 
 	def setup(IClass c) {
@@ -12,8 +12,8 @@ class Controller {
 	def constructor() {
 		String result = ""
 		
-		result += "\tpublic ${c.name}Controller() {\n"
-		result += "\t\t${c.name.toLowerCase()}Service = new ${c.name}Service();\n"
+		result += "\tpublic ${c.name}Controlador() {\n"
+		result += "\t\t${c.name.toLowerCase()}Servico = new ${c.name}Servico();\n"
 		result += "\t}"
 		
 		return result
@@ -22,7 +22,7 @@ class Controller {
 	def attributes() {
 		String result = ""
 		
-		result += "\tprivate ${c.name}Service ${c.name.toLowerCase()}Service;\n"
+		result += "\tprivate ${c.name}Servico ${c.name.toLowerCase()}Servico;\n"
 		
 		return result
 	}
@@ -41,18 +41,20 @@ class Controller {
 	def imports() {
 		String result = ""
 
+		result += "\nimport org.springframework.stereotype.Controller;\n"
+
 		result += "import org.springframework.web.bind.annotation.RequestMapping;\n"
 		result += "import org.springframework.web.bind.annotation.RequestMethod;\n"
 		result += "import org.springframework.web.bind.annotation.RestController;\n"
 
 		result += "\nimport ${c.owner.getFullyQualifiedName(".")}.dominio.${c.name};\n"
-		result += "import ${c.owner.getFullyQualifiedName(".")}.servico.${c.name}Service;\n"
+		result += "import ${c.owner.getFullyQualifiedName(".")}.servico.${c.name}Servico;\n"
 
 		return result
 	}
 
 	def methods() {
-		String service = "${c.name.toLowerCase()}Service"
+		String service = "${c.name.toLowerCase()}Servico"
 		String result = ""
 		String resource = c.name.substring(0, 1).toLowerCase() + c.name.substring(1, c.name.length());
 

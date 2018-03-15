@@ -1,0 +1,10 @@
+<%  if(c.hasStereotype("entity") && !c.hasStereotype("abstract")) { %>
+package ${c.owner.getFullyQualifiedName(".")}.servico;
+<% servico.setup(c) %>${servico.imports()}
+@Service
+public class ${c.name}Servico implements ICrudServico<${c.name}>  {
+${servico.attributes()}
+
+${servico.methods()}
+}
+<% } %>
