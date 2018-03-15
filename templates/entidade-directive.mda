@@ -35,8 +35,11 @@ class Entidade {
 		result += "\nimport javax.persistence.Table;";
 
 		attributes.each {
-			if(it.name == "id") {
+			if (it.name == "id") {
 				result += "\nimport javax.persistence.Id;";
+			}
+			if (it.dataType.name == "Date") {
+				result += "\nimport java.util.Date;";
 			}
 		}
 
@@ -45,25 +48,13 @@ class Entidade {
 		}
 
 		if (!attributesList.isEmpty()) {
+			result += "\nimport javax.persistence.OneToMany;";
 			result += "\nimport javax.persistence.CascadeType;";
 			result += "\n\nimport java.util.List;";
+			result += "\nimport java.util.ArrayList;";
 		}
 
 		return "${result}\n";
-	}
-
-	def resolveTableAnnotation() {
-		String tableName = ""
-		if(c.name.endsWith("y"))
-			tableName = c.name.toLowerCase().substring(0, c.name.size() - 1) + "ies"
-		else if(c.name.endsWith("m"))
-			tableName = c.name.toLowerCase().substring(0, c.name.size() - 1) + "ns"
-		else if(c.name.endsWith("s"))
-			tableName = c.name.toLowerCase()
-		else
-			tableName = c.name.toLowerCase() + "s"
-
-		return "@Table(name=\"${tableName}\")"
 	}
 
 	def attributes() {
