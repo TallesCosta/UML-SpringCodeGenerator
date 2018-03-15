@@ -1,0 +1,9 @@
+<%  if(!c.hasStereotype("entity")) { %>
+package ${c.owner.getFullyQualifiedName(".")};
+<% dominio.setup(c) %>${dominio.imports()}
+${dominio.qualifier()} ${dominio.type()} ${dominio.name()}${dominio.inheritages()} {
+
+${dominio.attributes()}${dominio.constructors()}${dominio.gets()}${dominio.sets()}${dominio.addAccessMethods()}${dominio.methods()}
+
+}
+<% } %>

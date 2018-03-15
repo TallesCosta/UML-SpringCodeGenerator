@@ -2,7 +2,7 @@ import java.util.*
 import in.labulle.anycode.uml.*
 import in.labulle.anycode.engine.groovy.directive.*
 
-class Entity {
+class Entidade {
 	IClass c;
 	List<IAttribute> attributes;
 	List<IAttribute> attributesList;
@@ -31,25 +31,25 @@ class Entity {
 
 	def imports() {
 		String result = "";
-		result += "import javax.persistence.Entity;\n";
-		result += "import javax.persistence.Table;\n";
+		result += "\nimport javax.persistence.Entity;";
+		result += "\nimport javax.persistence.Table;";
 
 		attributes.each {
 			if(it.name == "id") {
-				result += "import javax.persistence.Id;\n";
+				result += "\nimport javax.persistence.Id;";
 			}
 		}
 
 		if (!attributesList.isEmpty() || !attributes.isEmpty()) {
-			result += "import javax.persistence.Column;\n";
+			result += "\nimport javax.persistence.Column;";
 		}
 
 		if (!attributesList.isEmpty()) {
-			result += "import java.util.List;\n";
-			result += "import javax.persistence.CascadeType;\n";
+			result += "\nimport javax.persistence.CascadeType;";
+			result += "\n\nimport java.util.List;";
 		}
 
-		return "\n${result}";
+		return "${result}\n";
 	}
 
 	def resolveTableAnnotation() {
@@ -70,7 +70,7 @@ class Entity {
 		if(attributes.isEmpty() && attributesList.isEmpty())
 			return ""
 
-		String result = "\t// Attributes"
+		String result = "\t// Atributos"
 
 		attributes.each {
 			result += "\n\t${singleAttrAnnotation(it)}\n"
@@ -85,14 +85,14 @@ class Entity {
 		return "${result}\n"
 	}
 
-	def multipleAttrAnnotation(IAttribute attr) {
-		return "@OneToMany(targetEntity = ${attr.dataType.name}.class, cascade = CascadeType.ALL)"
-	}
-
 	def singleAttrAnnotation(IAttribute attr) {
 		if(attr.name == "id")
 			return "@Id"
 		return "@Column"
+	}
+
+	def multipleAttrAnnotation(IAttribute attr) {
+		return "@OneToMany(targetEntity = ${attr.dataType.name}.class, cascade = CascadeType.ALL)"
 	}
 
 }

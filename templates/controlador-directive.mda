@@ -2,7 +2,7 @@ import java.util.*
 import in.labulle.anycode.uml.*
 import in.labulle.anycode.engine.groovy.directive.*
 
-class Controller {
+class Controlador {
 	IClass c;
 
 	def setup(IClass c) {
@@ -12,7 +12,7 @@ class Controller {
 	def constructor() {
 		String result = ""
 		
-		result += "\tpublic ${c.name}Controller() {\n"
+		result += "\tpublic ${c.name}Controlador() {\n"
 		result += "\t\t\n"
 		result += "\t}"
 		
@@ -23,7 +23,7 @@ class Controller {
 		String result = ""
 
 		result += "\nimport org.springframework.stereotype.Controller;\n"
-		result += "\nimport ${c.owner.getFullyQualifiedName(".")}.repository.${c.name}Repository;\n"
+		result += "\nimport ${c.owner.getFullyQualifiedName(".")}.repositorio.${c.name}Repositorio;\n"
 
 		return result
 	}

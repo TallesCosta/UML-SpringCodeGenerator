@@ -1,0 +1,11 @@
+<%  if(c.hasStereotype("entity")) { %>
+package ${c.owner.getFullyQualifiedName(".")};
+<% entidade.setup(c); dominio.setup(c) %>${entidade.imports()}
+@Entity
+${entidade.resolveTableAnnotation()}
+${dominio.qualifier()} class ${c.name}${dominio.inheritages()} {
+
+${entidade.attributes()}${dominio.constructors()}${dominio.gets()}${dominio.sets()}${dominio.methods()}
+
+}
+<% } %>

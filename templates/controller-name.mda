@@ -1,1 +1,0 @@
-${targetDir}/${c.owner.getFullyQualifiedName("/")}/controller/${c.name}Controller.java

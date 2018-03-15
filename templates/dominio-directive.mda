@@ -2,7 +2,7 @@ import java.util.*
 import in.labulle.anycode.uml.*
 import in.labulle.anycode.engine.groovy.directive.*
 
-class Domain {
+class Dominio {
 	JavaDirective java = new JavaDirective()
 	IClassifier c;
 	List<IAttribute> attributes;
@@ -111,7 +111,7 @@ class Domain {
 		if(attributes.isEmpty() && attributesList.isEmpty())
 			return ""
 
-		String result = "\t// Attributes\n"
+		String result = "\t// Atributos\n"
 
 		attributes.each {
 			result += "\t${it.visibility.toString().toLowerCase()} ${it.dataType.name} ${it.name};\n"
@@ -128,11 +128,12 @@ class Domain {
 		if(attributes.isEmpty() && attributesList.isEmpty())
 			return ""
 
-		String result = "\t// Constructors\n"
+		String result = "\t// Construtores\n"
 
 		result += "${emptyConstructor()}"
 		result += "${halfConstructor()}"
-		result += "${fullConstructor()}"
+		if (!attributesList.isEmpty())
+			result += "\n${fullConstructor()}"
 
 		return "${result}\n"
 	}
@@ -143,7 +144,7 @@ class Domain {
 		result += "\tpublic ${c.name}() {"
 
 		attributesList.each {
-			result += "\n\t\tthis.${it.name} = ArrayList<>();"
+			result += "\n\t\tthis.${it.name} = new ArrayList<>();"
 		}
 
 		result += "\n\t}\n\n"
@@ -165,10 +166,10 @@ class Domain {
 		}
 
 		attributesList.each {
-			result += "\t\tthis.${it.name} = ArrayList<>();\n"
+			result += "\t\tthis.${it.name} = new ArrayList<>();\n"
 		}
 
-		result += "\t}\n\n"
+		result += "\t}\n"
 
 		return result
 	}
@@ -236,7 +237,7 @@ class Domain {
 		String result = ""
 
 		attributesList.each {
-			result += "\t// Additional access methods - ${it.name}\n"
+			result += "\t// Métodos de acesso adicionais - ${it.name}\n"
 			result += "\tpublic int count${it.name.capitalize()}() {\n"
 			result += "\t\treturn this.${it.name}.size();\n"
 			result += "\t}\n\n"
@@ -268,9 +269,9 @@ class Domain {
 		String result = ""
 
 		if(isClass(c)) 
-			result += "\t// Methods\n"
+			result += "\t// Métodos\n"
 		else 
-			result = "\t// Method Signatures\n"
+			result = "\t// Assinatura de Métodos\n"
 
 		c.operations.each {
 			result += "\t${it.visibility.toString().toLowerCase()} ${it.returnType.name} ${it.name}("

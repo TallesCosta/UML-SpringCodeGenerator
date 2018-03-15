@@ -1,0 +1,7 @@
+<%  if(c.hasStereotype("entity") && !c.hasStereotype("abstract")) { %>
+package ${c.owner.getFullyQualifiedName(".")}.repositorio;
+<% repositorio.setup(c) %>${repositorio.imports()}
+public interface ${c.name}Repositorio extends JpaRepository<${c.name}, Long> {
+
+}
+<% } %>
