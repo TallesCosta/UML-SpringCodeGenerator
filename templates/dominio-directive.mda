@@ -5,27 +5,33 @@ import in.labulle.anycode.engine.groovy.directive.*
 class Dominio {
 	JavaDirective java = new JavaDirective()
 	IClassifier c;
-	List<IAttribute> attributes;
+	List<IAttribute> attributesJava;
+	List<IAttribute> attributesComplex;
 	List<IAttribute> attributesList;
 
 	def setup(IClassifier c) {
 		this.c = c;
-		this.attributes = new ArrayList<IAttribute>()
+		this.attributesJava = new ArrayList<IAttribute>()
+		this.attributesComplex = new ArrayList<IAttribute>()
 		this.attributesList = new ArrayList<IAttribute>()
 
 		c.attributes.each {
-
-			// Attribute isn't a relation? OR
-			// Attribute is relation and owning side?
-			if (!it.isRelation() || !it.name.isEmpty()
-				&& it.isOneToOne()) {
-				// Primitive and simple association attributes
-				attributes.push(it)
+			// Attribute "primitive"
+			if (it.getDataType().getOwner().getFullyQualifiedName(".") == "java") {
+				// Class representes primiteves attributes
+				attributesJava.push(it)
+			}
 			// Attribute is a relation? AND
 			// Attribute is relation One-To-Many?
-			} else if (it.isRelation() && it.isOneToMany()) {
-				// multiple association attributes (List)
+			else if (it.isRelation() && it.isOneToMany()) {
+				// Multiple association attributes (List)
 				attributesList.push(it)
+			}
+			// Attribute is a relation? AND
+			// Attribute is relation One-To-One?
+			else if (it.isRelation() && it.isOneToOne()) {
+				// Simple association attributes
+				attributesComplex.push(it)
 			}
 		}
 	}
@@ -62,7 +68,7 @@ class Dominio {
 	def imports() {
 		String result = "";
 
-		attributes.each {
+		attributesJava.each {
 			if (it.dataType.name == "Date") {
 				result += "\nimport java.util.Date;";
 			}
@@ -116,12 +122,12 @@ class Dominio {
 	}
 
 	def attributes() {
-		if(attributes.isEmpty() && attributesList.isEmpty())
+		if(attributesJava.isEmpty() && attributesComplex && attributesList.isEmpty())
 			return ""
 
 		String result = "\t// Atributos\n"
 
-		attributes.each {
+		attributesJava.plus(attributesComplex).each {
 			result += "\t${it.visibility.toString().toLowerCase()} ${it.dataType.name} ${it.name};\n"
 		}
 
@@ -133,7 +139,7 @@ class Dominio {
 	}
 
 	def constructors() {
-		if(attributes.isEmpty() && attributesList.isEmpty())
+		if(attributesJava.isEmpty() && attributesComplex.isEmpty() && attributesList.isEmpty())
 			return ""
 
 		String result = "\t// Construtores\n"
@@ -163,14 +169,24 @@ class Dominio {
 	def halfConstructor() {
 		String result = "\tpublic ${c.name}("
 
-		attributes.each {
+		attributesJava.each {
 			result += "${it.dataType.name} ${it.name}, "
+		}
+
+		attributesComplex.each {
+			String name = it.dataType.name.substring(0, 1).toLowerCase() + it.dataType.name.substring(1)
+			result += "${it.dataType.name} ${name}, "
 		}
 
 		result = result.substring(0, result.length() - 2) + ") {\n"
 
-		attributes.each {
+		attributesJava.each {
 			result += "\t\tthis.${it.name} = ${it.name};\n"
+		}
+
+		attributesComplex.each {
+			String name = it.dataType.name.substring(0, 1).toLowerCase() + it.dataType.name.substring(1)
+			result += "\t\tthis.${name} = ${name};\n"
 		}
 
 		attributesList.each {
@@ -185,8 +201,13 @@ class Dominio {
 	def fullConstructor() {
 		String result = "\tpublic ${c.name}("
 
-		attributes.each {
+		attributesJava.each {
 			result += "${it.dataType.name} ${it.name}, "
+		}
+
+		attributesComplex.each {
+			String name = it.dataType.name.substring(0, 1).toLowerCase() + it.dataType.name.substring(1)
+			result += "${it.dataType.name} ${name}, "
 		}
 
 		attributesList.each {
@@ -195,7 +216,7 @@ class Dominio {
 
 		result = result.substring(0, result.length() - 2) + ") {\n"
 
-		attributes.plus(attributesList).each {
+		attributesJava.plus(attributesComplex).plus(attributesList).each {
 			result += "\t\tthis.${it.name} = ${it.name};\n"
 		}
 
@@ -205,30 +226,40 @@ class Dominio {
 	}
 
 	def gets() {
-		if(attributes.isEmpty() && attributesList.isEmpty())
+		if(attributesJava.isEmpty() && attributesComplex.isEmpty() && attributesList.isEmpty())
 			return ""
 
 		String result = "\t// Getters\n"
 
-		attributes.each {
-			result += "\tpublic ${it.dataType.name} get${it.name.capitalize()}() {\n\t\treturn ${it.name};\n\t}\n\n"
+		attributesJava.each {
+			result += "\tpublic ${it.dataType.name} get${it.name.capitalize()}() {\n\t\treturn this.${it.name};\n\t}\n\n"
+		}
+
+		attributesComplex.each {
+			String name = it.dataType.name.substring(0, 1).toLowerCase() + it.dataType.name.substring(1)
+			result += "\tpublic ${it.dataType.name} get${it.dataType.name.capitalize()}() {\n\t\treturn this.${name};\n\t}\n\n"
 		}
 
 		attributesList.each {
-			result += "\tpublic List<${it.dataType.name}> get${it.name.capitalize()}() {\n\t\treturn ${it.name};\n\t}\n\n"
+			result += "\tpublic List<${it.dataType.name}> get${it.name.capitalize()}() {\n\t\treturn this.${it.name};\n\t}\n\n"
 		}
 
 		return result
 	}
 
 	def sets() {
-		if(attributes.isEmpty() && attributesList.isEmpty())
+		if(attributesJava.isEmpty() && attributesComplex.isEmpty() && attributesList.isEmpty())
 			return ""
 
 		String result = "\t// Setters\n"
 
-		attributes.each {
+		attributesJava.each {
 			result += "\tpublic void set${it.name.capitalize()}(${it.dataType.name} ${it.name}) {\n\t\tthis.${it.name} = ${it.name};\n\t}\n\n"
+		}
+
+		attributesComplex.each {
+			String name = it.dataType.name.substring(0, 1).toLowerCase() + it.dataType.name.substring(1)
+			result += "\tpublic void set${it.dataType.name.capitalize()}(${it.dataType.name.capitalize()} ${name}) {\n\t\tthis.${name} = ${name};\n\t}\n\n"
 		}
 
 		attributesList.each {

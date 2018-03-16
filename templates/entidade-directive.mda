@@ -4,27 +4,33 @@ import in.labulle.anycode.engine.groovy.directive.*
 
 class Entidade {
 	IClass c;
-	List<IAttribute> attributes;
+	List<IAttribute> attributesJava;
+	List<IAttribute> attributesComplex;
 	List<IAttribute> attributesList;
 
 	def setup(IClass c) {
 		this.c = c;
-		this.attributes = new ArrayList<IAttribute>()
+		this.attributesJava = new ArrayList<IAttribute>()
+		this.attributesComplex = new ArrayList<IAttribute>()
 		this.attributesList = new ArrayList<IAttribute>()
 
 		c.attributes.each {
-
-			// Attribute isn't a relation? OR
-			// Attribute is relation and owning side?
-			if (!it.isRelation() || !it.name.isEmpty()
-				&& it.isOneToOne()) {
-				// Primitive and simple association attributes
-				attributes.push(it)
+			// Attribute "primitive"
+			if (it.getDataType().getOwner().getFullyQualifiedName(".") == "java") {
+				// Class representes primiteves attributes
+				attributesJava.push(it)
+			}
 			// Attribute is a relation? AND
 			// Attribute is relation One-To-Many?
-			} else if (it.isRelation() && it.isOneToMany()) {
-				// multiple association attributes (List)
+			else if (it.isRelation() && it.isOneToMany()) {
+				// Multiple association attributes (List)
 				attributesList.push(it)
+			}
+			// Attribute is a relation? AND
+			// Attribute is relation One-To-One?
+			else if (it.isRelation() && it.isOneToOne()) {
+				// Simple association attributes
+				attributesComplex.push(it)
 			}
 		}
 	}
@@ -32,9 +38,8 @@ class Entidade {
 	def imports() {
 		String result = "";
 		result += "\nimport javax.persistence.Entity;";
-		result += "\nimport javax.persistence.Table;";
 
-		attributes.each {
+		attributesJava.each {
 			if (it.name == "id") {
 				result += "\nimport javax.persistence.Id;";
 			}
@@ -43,13 +48,20 @@ class Entidade {
 			}
 		}
 
-		if (!attributesList.isEmpty() || !attributes.isEmpty()) {
+		if (!attributesJava.isEmpty()) {
 			result += "\nimport javax.persistence.Column;";
+		}
+
+		if (!attributesComplex.isEmpty() || !attributesList.isEmpty()) {
+			result += "\nimport javax.persistence.CascadeType;";
+		}
+
+		if (!attributesComplex.isEmpty()) {
+			result += "\nimport javax.persistence.OneToOne;";
 		}
 
 		if (!attributesList.isEmpty()) {
 			result += "\nimport javax.persistence.OneToMany;";
-			result += "\nimport javax.persistence.CascadeType;";
 			result += "\n\nimport java.util.List;";
 			result += "\nimport java.util.ArrayList;";
 		}
@@ -58,14 +70,19 @@ class Entidade {
 	}
 
 	def attributes() {
-		if(attributes.isEmpty() && attributesList.isEmpty())
+		if(attributesJava.isEmpty() && attributesComplex.isEmpty() && attributesList.isEmpty())
 			return ""
 
 		String result = "\t// Atributos"
 
-		attributes.each {
-			result += "\n\t${singleAttrAnnotation(it)}\n"
+		attributesJava.each {
+			result += "\n\t${simpleAttrAnnotation(it)}\n"
 			result += "\t${it.visibility.toString().toLowerCase()} ${it.dataType.name} ${it.name};\n"
+		}
+
+		attributesComplex.each {
+			result += "\n\t${singleAttrAnnotation(it)}\n"
+			result += "\t${it.visibility.toString().toLowerCase()} ${it.dataType.name} ${it.dataType.name.toLowerCase()};\n"
 		}
 
 		attributesList.each {
@@ -76,10 +93,14 @@ class Entidade {
 		return "${result}\n"
 	}
 
-	def singleAttrAnnotation(IAttribute attr) {
+	def simpleAttrAnnotation(IAttribute attr) {
 		if(attr.name == "id")
 			return "@Id"
 		return "@Column"
+	}
+
+	def singleAttrAnnotation(IAttribute attr) {
+		return "@OneToOne(targetEntity = ${attr.dataType.name}.class, cascade = CascadeType.ALL)"
 	}
 
 	def multipleAttrAnnotation(IAttribute attr) {
